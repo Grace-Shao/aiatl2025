@@ -25,6 +25,7 @@ interface Tweet {
 }
 
 export default function TwitterFeed() {
+  // Initialize with empty timestamps to avoid hydration mismatch
   const [tweets, setTweets] = useState<Tweet[]>([
     // Initial sample tweets with GIFs and memes
     {
@@ -36,7 +37,7 @@ export default function TwitterFeed() {
         verified: true,
       },
       content: "🏈 GAME TIME! Ravens vs Chiefs about to be WILD! Drop your hot takes below 👇",
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      timestamp: "",
       likes: 42,
       retweets: 15,
       replies: 8,
@@ -52,7 +53,7 @@ export default function TwitterFeed() {
         verified: false,
       },
       content: "When you see Derrick Henry break through the defense 💀",
-      timestamp: new Date(Date.now() - 7200000).toISOString(),
+      timestamp: "",
       likes: 128,
       retweets: 34,
       replies: 12,
@@ -68,7 +69,7 @@ export default function TwitterFeed() {
         verified: false,
       },
       content: "@PrizePicksAI What are Lamar Jackson's chances for 300+ yards tonight?",
-      timestamp: new Date(Date.now() - 10800000).toISOString(),
+      timestamp: "",
       likes: 23,
       retweets: 5,
       replies: 3,
@@ -76,6 +77,43 @@ export default function TwitterFeed() {
   ]);
   const [newTweetText, setNewTweetText] = useState("");
   const [isComposing, setIsComposing] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Helper function to format timestamp as relative time
+  const formatTimestamp = (timestamp: string | Date): string => {
+    if (!timestamp) return "";
+    if (timestamp === "Just now") return "Just now";
+    
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    if (diffDays < 7) return `${diffDays}d`;
+    return date.toLocaleDateString();
+  };
+
+  // Initialize timestamps after mount to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+    
+    // Set timestamps for sample tweets
+    setTweets(prev => prev.map((tweet, index) => {
+      if (tweet.timestamp === "" && tweet.id.startsWith("sample-")) {
+        const hoursAgo = index === 0 ? 1 : index === 1 ? 2 : 3;
+        return {
+          ...tweet,
+          timestamp: new Date(Date.now() - hoursAgo * 3600000).toISOString()
+        };
+      }
+      return tweet;
+    }));
+  }, []);
 
   useEffect(() => {
       // Fetch existing threads from API and prepend to sample tweets
@@ -92,7 +130,7 @@ export default function TwitterFeed() {
               verified: thread.author.includes('Bot')
             },
             content: thread.title + (thread.excerpt ? `\n\n${thread.excerpt}` : ''),
-            timestamp: new Date(thread.timestamp).toLocaleDateString(),
+            timestamp: thread.timestamp, // Store raw timestamp, format in render
             likes: thread.votes || 0,
             retweets: Math.floor(Math.random() * 20),
             replies: thread.comments?.length || 0,
@@ -256,7 +294,9 @@ export default function TwitterFeed() {
                   )}
                   <span className="text-gray-500">@{tweet.author.username}</span>
                   <span className="text-gray-500">·</span>
-                  <span className="text-gray-500">{tweet.timestamp}</span>
+                  <span className="text-gray-500">
+                    {isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ""}
+                  </span>
                 </div>
 
                 {/* Tweet Text */}

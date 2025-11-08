@@ -3,6 +3,7 @@
 import { Timeline } from "@/components/timeline"
 import { GameEventTracker } from "@/components/game-event-tracker"
 import TwitterFeed from "@/components/TwitterFeed"
+import { KeyMomentPopup } from "@/components/key-moment-popup"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Monitor, ExternalLink } from "lucide-react"
@@ -12,6 +13,13 @@ export default function Page() {
   const [duration, setDuration] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [videoWindow, setVideoWindow] = useState<Window | null>(null)
+  const [showForum, setShowForum] = useState(true)
+  const [currentKeyMoment, setCurrentKeyMoment] = useState<{
+    id: string
+    time: number
+    title: string
+    description: string
+  } | null>(null)
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -112,7 +120,12 @@ export default function Page() {
             />
             
             {/* Timeline Component */}
-            <Timeline currentTime={currentTime} duration={duration} isPlaying={isPlaying} />
+            <Timeline
+              currentTime={currentTime}
+              duration={duration}
+              isPlaying={isPlaying}
+              onNewMoment={setCurrentKeyMoment}
+            />
           </div>
         </div>
         
@@ -123,6 +136,21 @@ export default function Page() {
           </div>
         </div>
       </div>
+
+      {currentKeyMoment && (
+        <KeyMomentPopup
+          moment={currentKeyMoment}
+          onClose={() => setCurrentKeyMoment(null)}
+          onMakePost={() => {
+            console.log("[v0] Make post for moment:", currentKeyMoment)
+            setCurrentKeyMoment(null)
+          }}
+          onSendToGC={() => {
+            console.log("[v0] Send to GC for moment:", currentKeyMoment)
+            setCurrentKeyMoment(null)
+          }}
+        />
+      )}
     </div>
   )
 }
