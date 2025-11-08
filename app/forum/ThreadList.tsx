@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import ThreadModal from "./ThreadModal";
 
 type Thread = {
@@ -24,19 +24,40 @@ export default function ThreadList() {
   const [openThread, setOpenThread] = useState<Thread | null>(null);
   const [newTitle, setNewTitle] = useState("");
 
+  useEffect(() => {
+    // load threads from backend
+    fetch('/api/forum/threads').then(r => r.json()).then(data => {
+      if (Array.isArray(data)) setThreads(data as Thread[]);
+    }).catch(() => {});
+  }, []);
+
   function createThread() {
     if (!newTitle.trim()) return;
-    const t: Thread = {
-      id: `t-${Date.now()}`,
+    const payload = {
       title: newTitle,
+      excerpt: '',
       author: 'You',
-      excerpt: 'New thread',
-      timestamp: 'just now',
       votes: 0,
-      createdAt: Date.now(),
     };
-    setThreads([t, ...threads]);
-    setNewTitle("");
+    fetch('/api/forum/threads', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+      .then(r => r.json())
+      .then(t => {
+        setThreads(prev => [t, ...prev]);
+        setNewTitle("");
+      }).catch(() => {
+        // fallback local
+        const t: Thread = {
+          id: `t-${Date.now()}`,
+          title: newTitle,
+          author: 'You',
+          excerpt: 'New thread',
+          timestamp: 'just now',
+          votes: 0,
+          createdAt: Date.now(),
+        };
+        setThreads([t, ...threads]);
+        setNewTitle("");
+      });
   }
 
   // persist simple vote state in localStorage by thread id
@@ -62,13 +83,16 @@ export default function ThreadList() {
   }
 
   function vote(threadId: string, delta: number) {
+    // optimistic update
     setThreads(prev => {
       const updated = prev.map(t => t.id === threadId ? {...t, votes: Math.max(-9999, t.votes + delta)} : t);
-      // sort by votes desc, then by createdAt desc
       updated.sort((a,b) => (b.votes - a.votes) || (b.createdAt - a.createdAt));
       persistVotes(updated);
       return [...updated];
     });
+
+    fetch(`/api/forum/threads/${threadId}/vote`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ delta }) })
+      .catch(() => {});
   }
 
   return (
