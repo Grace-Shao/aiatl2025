@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Forum from '../forum/Forum';
 
 export default function MainView() {
   return (
@@ -19,8 +20,11 @@ export default function MainView() {
               Main View
             </h1>
             <p className="text-xl text-gray-300 mb-8">
-              This page is ready for your content.
+              Live discussion, memes, and timeline for in-game key moments.
             </p>
+
+            {/* Forum */}
+            <Forum />
           </div>
         </div>
       </div>
