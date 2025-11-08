@@ -1,6 +1,7 @@
 "use client"
 
 import { Timeline } from "@/components/timeline"
+import { GameEventTracker } from "@/components/game-event-tracker"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Forum from "@/app/forum/Forum"
@@ -101,7 +102,17 @@ export default function Page() {
 
         {/* Timeline Section */}
         <div className="w-full mb-8 flex justify-center">
-          <div className="w-full max-w-6xl">
+          <div className="w-full max-w-6xl space-y-4">
+            {/* Game Event Tracker - Shows recent events and auto-posts to forum */}
+            <GameEventTracker 
+              currentTime={currentTime} 
+              isPlaying={isPlaying}
+              onEventTriggered={(event) => {
+                console.log('[Main] Event triggered:', event);
+              }}
+            />
+            
+            {/* Timeline Component */}
             <Timeline currentTime={currentTime} duration={duration} isPlaying={isPlaying} />
           </div>
         </div>
