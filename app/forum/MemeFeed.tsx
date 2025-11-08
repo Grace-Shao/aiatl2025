@@ -36,10 +36,19 @@ function generateMemes(startId: number, count: number): Meme[] {
 }
 
 export default function MemeFeed() {
-  const [memes, setMemes] = useState<Meme[]>(generateMemes(0, 5));
+  const [memes, setMemes] = useState<Meme[]>([]);
   const [loading, setLoading] = useState(false);
   const loader = useRef<HTMLDivElement>(null);
   const currentPage = useRef(1);
+  const initialized = useRef(false);
+
+  // Initialize memes only on client side to avoid hydration mismatch
+  useEffect(() => {
+    if (!initialized.current) {
+      setMemes(generateMemes(0, 5));
+      initialized.current = true;
+    }
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, { threshold: 1.0 });
