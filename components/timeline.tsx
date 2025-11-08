@@ -8,6 +8,7 @@ interface TimelineProps {
   currentTime: number
   duration: number
   isPlaying: boolean
+  onNewMoment?: (moment: { id: string; time: number; title: string; description: string }) => void
 }
 
 interface KeyMoment {
@@ -31,7 +32,7 @@ const PREDEFINED_MOMENTS: Omit<KeyMoment, "addedAt">[] = [
   },
   {
     id: "moment-3",
-    time: 3,
+    time: 5,
     title: "First Pass",
     description: "Quarterback completes a quick pass to the receiver!",
     videoStart: 1,
@@ -39,7 +40,7 @@ const PREDEFINED_MOMENTS: Omit<KeyMoment, "addedAt">[] = [
   },
   {
     id: "moment-5",
-    time: 5,
+    time: 15,
     title: "Big Play",
     description: "Amazing run breaks through the defense!",
     videoStart: 3,
@@ -47,7 +48,7 @@ const PREDEFINED_MOMENTS: Omit<KeyMoment, "addedAt">[] = [
   },
 ]
 
-export function Timeline({ currentTime, duration, isPlaying }: TimelineProps) {
+export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: TimelineProps) {
   const [selectedMoment, setSelectedMoment] = useState<KeyMoment | null>(null)
   const [visibleMoments, setVisibleMoments] = useState<KeyMoment[]>([])
   const timelineRef = useRef<HTMLDivElement>(null)
@@ -56,10 +57,21 @@ export function Timeline({ currentTime, duration, isPlaying }: TimelineProps) {
     PREDEFINED_MOMENTS.forEach((moment) => {
       if (currentTime >= moment.time && !visibleMoments.find((m) => m.id === moment.id)) {
         console.log("[v0] Adding key moment at", moment.time, "seconds:", moment.title)
-        setVisibleMoments((prev) => [...prev, { ...moment, addedAt: Date.now() }].sort((a, b) => a.time - b.time))
+        const newMoment = { ...moment, addedAt: Date.now() }
+        setVisibleMoments((prev) => [...prev, newMoment].sort((a, b) => a.time - b.time))
+        
+        // Trigger popup callback
+        if (onNewMoment) {
+          onNewMoment({
+            id: moment.id,
+            time: moment.time,
+            title: moment.title,
+            description: moment.description,
+          })
+        }
       }
     })
-  }, [currentTime, visibleMoments])
+  }, [currentTime, visibleMoments, onNewMoment])
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)

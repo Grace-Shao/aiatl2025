@@ -74,3 +74,24 @@ body {
 .animate-ping-upward {
   animation: ping-upward 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
+
+/* Key moment popup animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
