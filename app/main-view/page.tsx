@@ -2,17 +2,16 @@
 
 import { Timeline } from "@/components/timeline"
 import { GameEventTracker } from "@/components/game-event-tracker"
+import TwitterFeed from "@/components/TwitterFeed"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import Forum from "@/app/forum/Forum"
-import { ChevronDown, ChevronUp, Monitor, ExternalLink } from "lucide-react"
+import { Monitor, ExternalLink } from "lucide-react"
 
 export default function Page() {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [videoWindow, setVideoWindow] = useState<Window | null>(null)
-  const [showForum, setShowForum] = useState(true)
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -117,47 +116,10 @@ export default function Page() {
           </div>
         </div>
         
-        {/* Bottom Section - Social Forum & Group Chats */}
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Social Forum Box - Left Half */}
-          <div>
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden">
-              {/* Header - Always Visible */}
-              <button
-                onClick={() => setShowForum(!showForum)}
-                className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
-              >
-                <h3 className="font-semibold text-white text-lg">Social / Forum</h3>
-                {showForum ? (
-                  <ChevronUp className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
-              
-              {/* Collapsible Content */}
-              <div className={`transition-all duration-300 ease-in-out ${
-                showForum ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-              } overflow-hidden`}>
-                <div className="border-t border-white/10">
-                  <Forum />
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Group Chats - Right Half */}
-          <div>
-            <div className="grid grid-cols-2 gap-4">
-              {/* 4 Chat boxes in 2x2 grid */}
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 p-6 h-48 flex items-center justify-center hover:border-white/30 transition-colors">
-                  <p className="text-gray-400">Group Chat {i}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Twitter-Style Social Media Feed - Full Width */}
+        <div className="w-full">
+          <div className="max-w-2xl mx-auto border-x border-gray-800">
+            <TwitterFeed />
           </div>
         </div>
       </div>
