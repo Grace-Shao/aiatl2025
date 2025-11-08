@@ -15,34 +15,49 @@ export default function ChooseGame() {
         {/* Main Content */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 md:p-12 border border-white/20">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Welcome to Your AI App
-            </h1>
-            <p className="text-xl text-gray-300 mb-8">
-              This is a template page ready for your content. You can add any features,
-              forms, or interactive elements here.
-            </p>
+            <div className="text-center mb-8">
+              <div className="text-6xl mb-4">🏈</div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                Choose Your Game
+              </h1>
+              <p className="text-xl text-gray-300">
+                Select a sports game to analyze with AI-powered insights
+              </p>
+            </div>
 
-            {/* Placeholder Content Area */}
+            {/* Game Selection Buttons */}
             <div className="space-y-6">
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                <h2 className="text-2xl font-semibold text-white mb-3">
-                  Content Section 1
-                </h2>
-                <p className="text-gray-300">
-                  Add your content here. This could be a form, dashboard, or any feature
-                  you need for your AI app.
+              <Link 
+                href="/main-view"
+                className="block bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group"
+              >
+                <div className="flex items-center gap-4 mb-3">
+                  <span className="text-4xl">🏈</span>
+                  <h2 className="text-2xl font-semibold text-white group-hover:text-purple-300 transition-colors">
+                    NFL Game Today
+                  </h2>
+                </div>
+                <p className="text-gray-300 ml-14">
+                  Predictions, player stats, and strategic insights for NFL matchups.
+                  Perfect for fantasy football and game-day decisions.
                 </p>
-              </div>
+              </Link>
 
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                <h2 className="text-2xl font-semibold text-white mb-3">
-                  Content Section 2
-                </h2>
-                <p className="text-gray-300">
-                  Another section ready for your custom content and functionality.
+              <Link 
+                href="/main-view"
+                className="block bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group"
+              >
+                <div className="flex items-center gap-4 mb-3">
+                  <span className="text-4xl">⚽</span>
+                  <h2 className="text-2xl font-semibold text-white group-hover:text-purple-300 transition-colors">
+                    Basketball Game Today
+                  </h2>
+                </div>
+                <p className="text-gray-300 ml-14">
+                  Predictions, player stats, and strategic insights for NBA matchups.
+                  Perfect for fantasy basketball and game-day decisions.
                 </p>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
