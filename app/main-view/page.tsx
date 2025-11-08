@@ -4,7 +4,7 @@ import { Timeline } from "@/components/timeline"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Forum from "@/app/forum/Forum"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, Monitor, ExternalLink } from "lucide-react"
 
 export default function Page() {
   const [currentTime, setCurrentTime] = useState(0)
@@ -88,9 +88,9 @@ export default function Page() {
             onClick={openVideoWindow}
             className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all hover:scale-105"
           >
-            <span className="text-xl">📺</span>
+            <Monitor className="h-5 w-5" />
             Open Video on Second Screen
-            <span className="text-sm">↗</span>
+            <ExternalLink className="h-4 w-4" />
           </button>
           {videoWindow && !videoWindow.closed && (
             <p className="text-sm text-gray-300 mt-2">✓ Video player is open on second screen</p>

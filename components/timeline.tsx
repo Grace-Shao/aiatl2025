@@ -1,6 +1,7 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import { Clock } from "lucide-react"
 
 interface TimelineProps {
   currentTime: number
@@ -23,7 +24,7 @@ export function Timeline({ currentTime, duration, isPlaying }: TimelineProps) {
     <Card className="p-6 h-full">
       <div className="flex items-center gap-3 mb-6">
         <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-          <span className="text-2xl">🕐</span>
+          <Clock className="h-5 w-5 text-purple-400" />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-white">Live Timeline</h2>

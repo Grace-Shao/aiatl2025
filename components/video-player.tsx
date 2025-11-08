@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Play, Pause, Volume2, VolumeX } from "lucide-react"
 
 interface VideoPlayerProps {
   onTimeUpdate?: (time: number) => void
@@ -142,11 +143,11 @@ export function VideoPlayer({ onTimeUpdate, onDurationChange, onPlayStateChange 
           disabled={!isReady}
           className="bg-purple-600 hover:bg-purple-700"
         >
-          <span className="text-xl">{isPlaying ? "⏸" : "▶"}</span>
+          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
         </Button>
 
         <Button size="icon" variant="secondary" onClick={toggleMute} disabled={!isReady}>
-          <span className="text-xl">{isMuted ? "🔇" : "🔊"}</span>
+          {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
         </Button>
 
         <div className="flex-1 text-sm text-gray-300">
