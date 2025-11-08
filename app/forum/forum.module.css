@@ -1,0 +1,97 @@
+.container {
+  background: #1a1a1a;
+}
+
+.thread {
+  background: #242424;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.thread:hover {
+  border-color: rgba(255,255,255,0.2);
+}
+
+.statsBar {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1.5rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.stat svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+.threadContent {
+  padding: 1rem;
+}
+
+.threadHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.votes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+}
+
+.voteButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.15s;
+}
+
+.voteButton:hover {
+  color: #fff;
+}
+
+.upvoted {
+  color: #4ade80;
+}
+
+.downvoted {
+  color: #f87171;
+}
+
+.trending {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(234,179,8,0.1);
+  color: #fcd34d;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.meta {
+  font-size: 0.875rem;
+  color: #666;
+}
