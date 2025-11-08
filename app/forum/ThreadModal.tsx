@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 
 type Thread = {
   id: string;
@@ -11,13 +11,31 @@ type Thread = {
 };
 
 export default function ThreadModal({thread, onClose}: {thread: Thread; onClose: () => void}) {
-  const [comments, setComments] = useState<string[]>(["Great play!", "That was clutch"]);
+  const [comments, setComments] = useState<Array<{id:string;text:string;author:string;timestamp:string;votes:number}>>((thread as any)?.comments ?? []);
   const [text, setText] = useState("");
 
-  function addComment() {
+  async function refreshThread() {
+    try {
+      const r = await fetch('/api/forum/threads');
+      const data = await r.json();
+      const fresh = data.find((t: any) => t.id === thread.id);
+      if (fresh) setComments(fresh.comments || []);
+    } catch (e) {}
+  }
+
+  useEffect(() => { refreshThread(); }, []);
+
+  async function addComment() {
     if (!text.trim()) return;
-    setComments([...comments, text.trim()]);
-    setText("");
+    try {
+      const res = await fetch(`/api/forum/threads/${thread.id}/comments`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ text, author: 'You' }) });
+      const json = await res.json();
+      setComments(prev => [...prev, json]);
+      setText("");
+    } catch (e) {
+      setComments(prev => [...prev, { id: `c-${Date.now()}`, text: text.trim(), author: 'You', timestamp: new Date().toISOString(), votes: 0 }]);
+      setText("");
+    }
   }
 
   return (
@@ -51,9 +69,29 @@ export default function ThreadModal({thread, onClose}: {thread: Thread; onClose:
             <h3 className="text-lg font-medium text-white mb-4">Comments</h3>
             
             <div className="space-y-4">
-              {comments.map((c, i) => (
-                <div key={i} className="p-3 rounded-lg bg-white/5">
-                  <p className="text-white/90">{c}</p>
+              {comments.map((c) => (
+                <div key={c.id} className="p-3 rounded-lg bg-white/5 flex items-start gap-3">
+                  <div className="flex flex-col items-center">
+                    <button onClick={async () => {
+                      // vote comment +1
+                      try { await fetch(`/api/forum/comments/${c.id}/vote`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ threadId: thread.id, delta: 1 }) }); } catch(e){}
+                      setComments(prev => prev.map(x => x.id===c.id?{...x, votes: (x.votes||0)+1}:x));
+                    }} className="text-green-400">▲</button>
+                    <div className="text-white font-medium">{c.votes ?? 0}</div>
+                    <button onClick={async () => {
+                      try { await fetch(`/api/forum/comments/${c.id}/vote`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ threadId: thread.id, delta: -1 }) }); } catch(e){}
+                      setComments(prev => prev.map(x => x.id===c.id?{...x, votes: (x.votes||0)-1}:x));
+                    }} className="text-red-400">▼</button>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-white font-medium">{c.author}</div>
+                        <div className="text-sm text-white/50">{new Date(c.timestamp).toLocaleString()}</div>
+                      </div>
+                    </div>
+                    <p className="text-white/90 mt-2">{c.text}</p>
+                  </div>
                 </div>
               ))}
             </div>
