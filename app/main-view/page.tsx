@@ -67,7 +67,7 @@ export default function Page() {
 
   return (
     <div className="min-h-screen gradient-primary">
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 py-8">
         <Link
           href="/choose-game"
           className="inline-flex items-center text-gray-300 hover:text-white transition-colors mb-6"
@@ -76,34 +76,39 @@ export default function Page() {
         </Link>
 
         {/* Header */}
-        <header className="mb-8">
+        <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-balance bg-gradient-to-r from-purple-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
             PrizePicks Live Track
           </h1>
           <p className="text-muted-foreground mt-2">Your second screen sports companion</p>
         </header>
 
-        <div className="mb-6">
-          <button
-            onClick={openVideoWindow}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all hover:scale-105"
-          >
-            <Monitor className="h-5 w-5" />
-            Open Video on Second Screen
-            <ExternalLink className="h-4 w-4" />
-          </button>
-          {videoWindow && !videoWindow.closed && (
-            <p className="text-sm text-gray-300 mt-2">✓ Video player is open on second screen</p>
-          )}
+        <div className="mb-6 flex justify-center">
+          <div className="flex flex-col items-center">
+            <button
+              onClick={openVideoWindow}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all hover:scale-105"
+            >
+              <Monitor className="h-5 w-5" />
+              Open Video on Second Screen
+              <ExternalLink className="h-4 w-4" />
+            </button>
+            {videoWindow && !videoWindow.closed && (
+              <p className="text-sm text-gray-300 mt-2">✓ Video player is open on second screen</p>
+            )}
+          </div>
         </div>
 
         {/* Timeline Section */}
-        <div className="max-w-6xl mb-8">
-          <Timeline currentTime={currentTime} duration={duration} isPlaying={isPlaying} />
+        <div className="w-full mb-8 flex justify-center">
+          <div className="w-full max-w-6xl">
+            <Timeline currentTime={currentTime} duration={duration} isPlaying={isPlaying} />
+          </div>
         </div>
         
         {/* Bottom Section - Social Forum & Group Chats */}
-        <div className="max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="w-full flex justify-center">
+          <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Social Forum Box - Left Half */}
           <div>
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden">
@@ -141,6 +146,7 @@ export default function Page() {
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </div>
       </div>
