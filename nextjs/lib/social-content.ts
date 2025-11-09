@@ -2,21 +2,21 @@
 // Using placeholder CDN to avoid copyright issues.
 
 export const sampleGifs: string[] = [
-	"https://placehold.co/800x450/1d4ed8/ffffff.gif?text=Celebration+GIF",
-	"https://placehold.co/800x450/9333ea/ffffff.gif?text=Hype+GIF",
-	"https://placehold.co/800x450/f97316/ffffff.gif?text=Touchdown+GIF",
-	"https://placehold.co/800x450/16a34a/ffffff.gif?text=Highlight+GIF",
-	"https://placehold.co/800x450/ef4444/ffffff.gif?text=Clutch+GIF",
-	"https://placehold.co/800x450/0ea5e9/ffffff.gif?text=Big+Play+GIF",
+	"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDU2cHdyN3c0M2MwbGlkZjB5ZG90NzZlN3MxNHViZjBoMXJycGJxayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExamxveHNocTBuNncxbmtwMWxnejA3aHZjMm9oenZmdjVzczFmbTM3diZlcD12MV9naWZzX3NlYXJjaCZjdD1n/H3LbIGBsYsEukxDVfR/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDVxYnZwOGIyZjU5eThmd3dmMjBreXFldGt4emxtOWljaDE5MnJ5byZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NdrO9USb8683H1sVuo/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeG5mdXZoY3l4MmEwbjJ0NmFqZDFjMmhyN3R4M2g4OXZtNHptcXBvcSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rV1SzvMoCtH2vnh78/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnQzOHY5eTJwd2dhNHo4cmcwenR6OXoybmtma3hhYnJma20xeWJiNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cmxRBU0m7BNvr9POnq/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa3U2ZDVrYjVjc3Zvd2c3YmIwaDdnNXdlM3J3b3k1MGZwM3FodDQzMyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/146BUR1IHbM6zu/giphy.gif",
 ];
 
 export const sampleMemes: string[] = [
-	"https://placehold.co/800x450/0f172a/ffffff/png?text=Sports+Meme",
-	"https://placehold.co/800x450/111827/ffffff/png?text=Reaction+Meme",
-	"https://placehold.co/800x450/030712/ffffff/png?text=Defense+Meme",
-	"https://placehold.co/800x450/1f2937/ffffff/png?text=Offense+Meme",
-	"https://placehold.co/800x450/374151/ffffff/png?text=Betting+Meme",
-	"https://placehold.co/800x450/334155/ffffff/png?text=Coach+Meme",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzdibXp4dWRwZ2VvZXJpd21najM5Nnlqa3Rod2pxeHcwaDJydGwweiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/t3sZxY5zS5B0z5zMIz/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDd3bGxiMWk1cTN2Nmg0NG00aW03aXdvamVxYXk3ZjJ2NTM1enZleiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/WnO24PNDfFur9yXCO5/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanhheTRxNGFqbjNyOXZsa2VuM3NzYWU2bzlvaXR1OWdwMHhubmNvYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/qieBGYm8BkkTMJKuyR/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanhheTRxNGFqbjNyOXZsa2VuM3NzYWU2bzlvaXR1OWdwMHhubmNvYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/qieBGYm8BkkTMJKuyR/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2IwbGRhb3dtd3pyaTBkcXMxZmY0aXR3YXpqdDZ2bmNlcDdhejF6ZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/RM5m5NoNRtuYCj1szf/giphy.gif",
+	"https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExejR2OXBjeGtmb3JkMWdsemhkeW16amx4dnZ4MGU0anl1bzQ5NmRyciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/QLtI0CxK8iGceO9Sja/giphy.gif",
 ];
 
 export const funnyTweetTemplates: string[] = [

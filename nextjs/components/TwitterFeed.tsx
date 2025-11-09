@@ -183,7 +183,7 @@ export default function TwitterFeed() {
               avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${thread.author}`,
               verified: thread.author.includes('Bot')
             },
-            content: thread.title + (thread.excerpt ? `\n\n${thread.excerpt}` : ''),
+            content: thread.excerpt || thread.title,
             timestamp: thread.timestamp, // Store raw timestamp, format in render
             likes: thread.votes || 0,
             retweets: Math.floor(Math.random() * 20),
