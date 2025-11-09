@@ -145,9 +145,11 @@ export function MessagesPanel({ isOpen, onClose }: MessagesPanelProps) {
             >
               {/* Avatar */}
               <div className="relative flex-shrink-0">
-                <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center">
-                  <User className="h-7 w-7 text-gray-400" />
-                </div>
+                <img
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"
+                  alt={message.name}
+                  className="w-14 h-14 rounded-full bg-gray-700"
+                />
                 {message.hasUnread && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-purple-600 rounded-full border-2 border-black" />
                 )}
