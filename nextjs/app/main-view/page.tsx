@@ -139,7 +139,7 @@ export default function Page() {
         </div>
       </div>
 
-      {currentKeyMoment && (
+      {/* {currentKeyMoment && (
         <KeyMomentPopup
           moment={currentKeyMoment}
           onClose={() => setCurrentKeyMoment(null)}
@@ -152,7 +152,7 @@ export default function Page() {
             setCurrentKeyMoment(null)
           }}
         />
-      )}
+      )} */}
 
       <MessagesPanel isOpen={isMessagesOpen} onClose={() => setIsMessagesOpen(false)} />
     </div>

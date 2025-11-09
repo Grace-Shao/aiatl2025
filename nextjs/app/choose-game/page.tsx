@@ -71,9 +71,6 @@ export default function ChooseGame() {
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
         <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-8">
-
-
-
           <span className="mr-2">←</span> Back to Home
         </Link>
 
@@ -111,7 +108,7 @@ export default function ChooseGame() {
                   {/* Right: Game Details (60%) */}
                   <div className="w-[60%] p-5 flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-purple-400 uppercase tracking-wider">
                           {game.sport}
                         </span>
