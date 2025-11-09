@@ -52,26 +52,38 @@ export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: Time
   const [selectedMoment, setSelectedMoment] = useState<KeyMoment | null>(null)
   const [visibleMoments, setVisibleMoments] = useState<KeyMoment[]>([])
   const timelineRef = useRef<HTMLDivElement>(null)
+  const triggeredMomentsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     PREDEFINED_MOMENTS.forEach((moment) => {
-      if (currentTime >= moment.time && !visibleMoments.find((m) => m.id === moment.id)) {
-        console.log("[v0] Adding key moment at", moment.time, "seconds:", moment.title)
-        const newMoment = { ...moment, addedAt: Date.now() }
-        setVisibleMoments((prev) => [...prev, newMoment].sort((a, b) => a.time - b.time))
+      if (currentTime >= moment.time && !triggeredMomentsRef.current.has(moment.id)) {
+        setVisibleMoments((prev) => {
+          // Check if moment already exists in previous state
+          if (prev.find((m) => m.id === moment.id)) {
+            return prev
+          }
+          
+          console.log("[v0] Adding key moment at", moment.time, "seconds:", moment.title)
+          const newMoment = { ...moment, addedAt: Date.now() }
+          return [...prev, newMoment].sort((a, b) => a.time - b.time)
+        })
         
-        // Trigger popup callback
+        // Mark as triggered and call callback outside of setState
+        triggeredMomentsRef.current.add(moment.id)
         if (onNewMoment) {
-          onNewMoment({
-            id: moment.id,
-            time: moment.time,
-            title: moment.title,
-            description: moment.description,
-          })
+          // Use setTimeout to defer the callback to avoid setState during render
+          setTimeout(() => {
+            onNewMoment({
+              id: moment.id,
+              time: moment.time,
+              title: moment.title,
+              description: moment.description,
+            })
+          }, 0)
         }
       }
     })
-  }, [currentTime, visibleMoments, onNewMoment])
+  }, [currentTime, onNewMoment])
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -148,19 +160,21 @@ export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: Time
             })}
 
             {/* Key moment teardrops - appear when timestamp is crossed */}
-            {visibleMoments.map((moment) => {
-              const offset = currentTime - moment.time
+            {visibleMoments
+              .filter((moment, index, self) => self.findIndex((m) => m.id === moment.id) === index)
+              .map((moment) => {
+                const offset = currentTime - moment.time
 
-              // Only show if within reasonable range
-              if (offset < -5 || offset > 100) return null
+                // Only show if within reasonable range
+                if (offset < -5 || offset > 100) return null
 
-              const isLatest = latestMoment?.id === moment.id
-              const isNew = isMomentNew(moment)
-              const showAnimation = isLatest && isNew
+                const isLatest = latestMoment?.id === moment.id
+                const isNew = isMomentNew(moment)
+                const showAnimation = isLatest && isNew
 
-              return (
-                <button
-                  key={moment.id}
+                return (
+                  <button
+                    key={moment.id}
                   onClick={() => setSelectedMoment(moment)}
                   className="absolute top-2 transform -translate-x-1/2 cursor-pointer group z-10 transition-all duration-200"
                   style={{ left: getMarkerLeftPosition(moment.time) }}

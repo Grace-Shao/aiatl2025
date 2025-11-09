@@ -4,9 +4,10 @@ import { Timeline } from "@/components/timeline"
 import { GameEventTracker } from "@/components/game-event-tracker"
 import TwitterFeed from "@/components/TwitterFeed"
 import { KeyMomentPopup } from "@/components/key-moment-popup"
+import { MessagesPanel } from "@/components/messages-panel"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Monitor, ExternalLink } from "lucide-react"
+import { Monitor, ExternalLink, MessageCircle } from "lucide-react"
 
 export default function Page() {
   const [currentTime, setCurrentTime] = useState(0)
@@ -14,6 +15,7 @@ export default function Page() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [videoWindow, setVideoWindow] = useState<Window | null>(null)
   const [showForum, setShowForum] = useState(true)
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false)
   const [currentKeyMoment, setCurrentKeyMoment] = useState<{
     id: string
     time: number
@@ -85,6 +87,13 @@ export default function Page() {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setIsMessagesOpen(true)}
+              className="text-white hover:bg-white/10 p-2 rounded-md transition-all"
+              aria-label="Open messages"
+            >
+              <MessageCircle className="h-6 w-6" />
+            </button>
+            <button
               onClick={openVideoWindow}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-3 py-2 rounded-md font-medium flex items-center gap-2 transition-all"
               aria-label="Open video on second screen"
@@ -144,6 +153,8 @@ export default function Page() {
           }}
         />
       )}
+
+      <MessagesPanel isOpen={isMessagesOpen} onClose={() => setIsMessagesOpen(false)} />
     </div>
   )
 }
