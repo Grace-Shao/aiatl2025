@@ -8,7 +8,7 @@ const sampleTweets = [
     author: {
       name: "PrizePicks AI",
       username: "PrizePicksAI",
-      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=PrizePicksAI`,
+      avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AI",
       verified: true,
     },
     content: "🏈 GAME TIME! Ravens vs Chiefs about to be WILD! Drop your hot takes below 👇",
@@ -24,7 +24,7 @@ const sampleTweets = [
     author: {
       name: "NFL Fan",
       username: "nflfan2025",
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=nflfan`,
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
       verified: false,
     },
     content: "When you see Derrick Henry break through the defense 💀",
@@ -40,7 +40,7 @@ const sampleTweets = [
     author: {
       name: "Sports Bettor",
       username: "sportsbetking",
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=betking`,
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
       verified: false,
     },
     content: "@PrizePicksAI What are Lamar Jackson's chances for 300+ yards tonight?",

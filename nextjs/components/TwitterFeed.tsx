@@ -63,7 +63,7 @@ export default function TwitterFeed() {
         author: {
           name: `Fan ${seed}`,
           username: seed,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`,
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
           verified: false,
         },
         content: template,
@@ -124,8 +124,10 @@ export default function TwitterFeed() {
             author: {
               name: thread.author,
               username: thread.author.toLowerCase().replace(/\s/g, ''),
-              avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${thread.author}`,
-              verified: thread.author.includes('Bot')
+              avatar: thread.author.includes('AI') || thread.author.includes('Bot') 
+                ? "https://api.dicebear.com/7.x/bottts/svg?seed=AI"
+                : "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
+              verified: thread.author.includes('Bot') || thread.author.includes('AI')
             },
             content: thread.excerpt || thread.title,
             timestamp: thread.timestamp,
@@ -211,7 +213,7 @@ export default function TwitterFeed() {
       author: {
         name: "You",
         username: "you",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=you",
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
       },
       content: newTweetText,
       timestamp: "Just now",
@@ -328,7 +330,7 @@ export default function TwitterFeed() {
         return prev; // avoid reposting a repost card directly
       }
 
-      const you = { by: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=you' };
+      const you = { by: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user' };
 
       // Check if you already reposted this tweet
       const existingRtIndex = prev.findIndex(
@@ -400,7 +402,7 @@ export default function TwitterFeed() {
 
       const reply: Tweet = {
         id: `reply-${Date.now()}-${tweetId}`,
-        author: { name: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=you' },
+        author: { name: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user' },
         content: text,
         timestamp: 'Just now',
         likes: 0,
@@ -432,7 +434,7 @@ export default function TwitterFeed() {
       <div className="border-b border-gray-800 p-4">
         <div className="flex gap-3">
           <img 
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=you" 
+            src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" 
             alt="Your avatar" 
             className="w-12 h-12 rounded-full"
           />
@@ -655,7 +657,7 @@ export default function TwitterFeed() {
                   <div className="mt-3 pl-12">
                     <div className="flex gap-3 items-start">
                       <img 
-                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=you" 
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" 
                         alt="Your avatar" 
                         className="w-8 h-8 rounded-full"
                       />
