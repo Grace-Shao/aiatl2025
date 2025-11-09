@@ -11,6 +11,7 @@ async def listen_to_audio_stream(
 ) -> None:
     """
     Listen to the audio stream from the streaming API.
+    Streams audio segments sequentially with proper timing synchronization.
     
     Args:
         base_url: Base URL of the streaming API
@@ -32,13 +33,31 @@ async def listen_to_audio_stream(
                 response.raise_for_status()
                 
                 print(f"Connected to audio stream: {response.status_code}")
+                print("Receiving time-synchronized audio segments...")
+                
+                total_bytes = 0
+                segment_count = 0
+                start_time = asyncio.get_event_loop().time()
                 
                 async for chunk in response.aiter_bytes(chunk_size=8192):
-                    if chunk_callback:
-                        chunk_callback(chunk)
-                    else:
-                        # Default: just print the chunk size
-                        print(f"Received audio chunk: {len(chunk)} bytes")
+                    if chunk:
+                        total_bytes += len(chunk)
+                        segment_count += 1
+                        elapsed = asyncio.get_event_loop().time() - start_time
+                        
+                        if chunk_callback:
+                            chunk_callback(chunk)
+                        else:
+                            # Default: print periodic updates (every 100 chunks)
+                            if segment_count % 100 == 0:
+                                print(f"[{elapsed:.1f}s] Segments: {segment_count} | "
+                                      f"Total: {total_bytes / 1024:.1f} KB")
+                
+                elapsed = asyncio.get_event_loop().time() - start_time
+                print(f"\n✓ Audio stream completed")
+                print(f"  Duration: {elapsed:.1f}s")
+                print(f"  Segments: {segment_count}")
+                print(f"  Total: {total_bytes / 1024:.1f} KB ({total_bytes / (1024 * 1024):.2f} MB)")
                         
         except httpx.HTTPError as e:
             print(f"HTTP error occurred: {e}")
@@ -165,8 +184,8 @@ async def example_both_streams():
     """Example: Listen to both audio and events simultaneously."""
     # Run both listeners concurrently
     await asyncio.gather(
-        # listen_to_audio_stream(),
-        listen_to_events_stream(speed=100.0)
+        listen_to_audio_stream(),
+        # listen_to_events_stream(speed=100.0)
     )
 
 
