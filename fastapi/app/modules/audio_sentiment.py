@@ -5,10 +5,19 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import librosa
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
 
 from huggingface_hub import login
-login(token=os.getenv("HUGGINGFACE_API_KEY"))
+
+# Only login if token is available
+hf_token = os.getenv("HUGGINGFACE_API_KEY")
+if hf_token:
+    login(token=hf_token)
+else:
+    print("Warning: HUGGINGFACE_API_KEY not found in environment variables")
 
 from transformers import pipeline
 import torch

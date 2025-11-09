@@ -1,0 +1,346 @@
+[
+  {
+    "timestamp": 589.93,
+    "play_score": 47.0,
+    "play_category": "HIGH",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 32.9,
+    "description": "Scrambled",
+    "quarter": 1,
+    "breakdown": {
+      "third_down_long": 20,
+      "third_down_conversion": 15,
+      "big_gain_15plus": 12
+    }
+  },
+  {
+    "timestamp": 816.81,
+    "play_score": 47.0,
+    "play_category": "HIGH",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 32.9,
+    "description": "Scrambled",
+    "quarter": 1,
+    "breakdown": {
+      "third_down_long": 20,
+      "third_down_conversion": 15,
+      "big_gain_15plus": 12
+    }
+  },
+  {
+    "timestamp": 936.06,
+    "play_score": 36.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 25.2,
+    "description": "Scrambled",
+    "quarter": 1,
+    "breakdown": {
+      "third_down": 15,
+      "third_down_conversion": 15,
+      "gain_10plus": 6
+    }
+  },
+  {
+    "timestamp": 1212.38,
+    "play_score": 50.0,
+    "play_category": "HIGH",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 35.0,
+    "description": "Scrambled",
+    "quarter": 1,
+    "breakdown": {
+      "third_down": 15,
+      "third_down_conversion": 15,
+      "big_gain_25plus": 20
+    }
+  },
+  {
+    "timestamp": 1524.57,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 1,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 1670.0,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 1,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 1739.0,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 2,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 2076.19,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 2,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 2466.36,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 2,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 2600.03,
+    "play_score": 47.0,
+    "play_category": "HIGH",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 32.9,
+    "description": "Scrambled",
+    "quarter": 2,
+    "breakdown": {
+      "third_down_long": 20,
+      "third_down_conversion": 15,
+      "big_gain_15plus": 12
+    }
+  },
+  {
+    "timestamp": 2852.92,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 2,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 3355.09,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 2,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 3604.36,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 2,
+    "breakdown": {
+      "third_down": 15,
+      "third_down_conversion": 15
+    }
+  },
+  {
+    "timestamp": 4246.32,
+    "play_score": 47.0,
+    "play_category": "HIGH",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 32.9,
+    "description": "Scrambled",
+    "quarter": 3,
+    "breakdown": {
+      "third_down_long": 20,
+      "third_down_conversion": 15,
+      "big_gain_15plus": 12
+    }
+  },
+  {
+    "timestamp": 4466.73,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 3,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 4702.55,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 3,
+    "breakdown": {
+      "third_down": 15,
+      "third_down_conversion": 15
+    }
+  },
+  {
+    "timestamp": 4953.79,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 3,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 5281.23,
+    "play_score": 42.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 29.4,
+    "description": "Scrambled",
+    "quarter": 3,
+    "breakdown": {
+      "third_down": 15,
+      "third_down_conversion": 15,
+      "big_gain_15plus": 12
+    }
+  },
+  {
+    "timestamp": 5920.64,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 4,
+    "breakdown": {
+      "third_down": 15,
+      "third_down_conversion": 15
+    }
+  },
+  {
+    "timestamp": 6361.74,
+    "play_score": 50.0,
+    "play_category": "HIGH",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 35.0,
+    "description": "Scrambled",
+    "quarter": 4,
+    "breakdown": {
+      "fourth_down_attempt": 30,
+      "fourth_down_conversion": 20
+    }
+  },
+  {
+    "timestamp": 6556.05,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 4,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 6885.11,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 4,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 7025.36,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 4,
+    "breakdown": {
+      "third_down": 15,
+      "third_down_conversion": 15
+    }
+  },
+  {
+    "timestamp": 7251.0,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 4,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  },
+  {
+    "timestamp": 7251.0,
+    "play_score": 30.0,
+    "play_category": "MEDIUM",
+    "audio_excitement": 0.0,
+    "audio_energy": 0.0,
+    "combined_score": 21.0,
+    "description": "Scrambled",
+    "quarter": 4,
+    "breakdown": {
+      "fourth_down_attempt": 30
+    }
+  }
+]
