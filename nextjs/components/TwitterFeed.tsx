@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react";
-import { Heart, MessageCircle, Repeat2, Bookmark, Share, MoreHorizontal, Image as ImageIcon, Smile, CalendarDays } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Bookmark, MoreHorizontal, Image as ImageIcon, Smile, CalendarDays } from "lucide-react";
 import { sampleGifs, sampleMemes, funnyTweetTemplates } from "@/lib/social-content";
 
 interface Tweet {
@@ -22,6 +22,13 @@ interface Tweet {
   isLiked?: boolean;
   isRetweeted?: boolean;
   isBookmarked?: boolean;
+  // Repost (retweet) support
+  isRepost?: boolean;
+  repostOfId?: string; // id of the original tweet
+  repostMeta?: { by: string; username: string; avatar: string };
+  // Replies
+  isReply?: boolean;
+  replyToId?: string;
 }
 
 export default function TwitterFeed() {
@@ -82,6 +89,8 @@ export default function TwitterFeed() {
   const [selectedMediaType, setSelectedMediaType] = useState<'image' | 'gif' | 'video' | undefined>(undefined);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [openReply, setOpenReply] = useState<Record<string, boolean>>({});
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
 
   // Helper to generate more tweets (older ones) for infinite scroll simulation
   const generateMoreTweets = (count = 6): Tweet[] => {
@@ -128,14 +137,14 @@ export default function TwitterFeed() {
   const formatTimestamp = (timestamp: string | Date): string => {
     if (!timestamp) return "";
     if (timestamp === "Just now") return "Just now";
-    
+
     const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-    
+
     if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m`;
     if (diffHours < 24) return `${diffHours}h`;
@@ -146,7 +155,7 @@ export default function TwitterFeed() {
   // Initialize timestamps after mount to avoid hydration mismatch
   useEffect(() => {
     setIsMounted(true);
-    
+
     // Set timestamps for sample tweets
     setTweets(prev => prev.map((tweet, index) => {
       if (tweet.timestamp === "" && tweet.id.startsWith("sample-")) {
@@ -160,35 +169,10 @@ export default function TwitterFeed() {
     }));
   }, []);
 
-  // Fetch sample tweets from the new API route
   useEffect(() => {
-    fetch('/api/sample-tweets')
-      .then(r => {
-        if (!r.ok) {
-          throw new Error(`Failed to fetch sample tweets: ${r.statusText}`);
-        }
-        return r.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setTweets(data);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching sample tweets:', error);
-      });
-  }, []);
-
-  // Fetch existing threads from API and prepend to sample tweets
-  useEffect(() => {
-    // Fetch existing threads from API and prepend to sample tweets
+      // Fetch existing threads from API and prepend to sample tweets
     fetch('/api/forum/threads')
-      .then(r => {
-        if (!r.ok) {
-          throw new Error(`Failed to fetch threads: ${r.statusText}`);
-        }
-        return r.json();
-      })
+      .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
           const formattedTweets: Tweet[] = data.map(thread => ({
@@ -205,13 +189,11 @@ export default function TwitterFeed() {
             retweets: Math.floor(Math.random() * 20),
             replies: thread.comments?.length || 0,
           }));
-          // Prepend new tweets from API to sample tweets
-          setTweets(prev => [...formattedTweets, ...prev]);
+            // Prepend new tweets from API to sample tweets
+            setTweets(prev => [...formattedTweets, ...prev]);
         }
       })
-      .catch(error => {
-        console.error('Error fetching threads:', error);
-      });
+      .catch(console.error);
   }, []);
 
   // Observe the bottom sentinel for infinite scroll
@@ -233,7 +215,7 @@ export default function TwitterFeed() {
     if (!newTweetText.trim()) return;
 
     const newTweet: Tweet = {
-      id: `t-${Date.now()}-${Math.random()}`, // Ensure unique ID
+      id: `t-${Date.now()}`,
       author: {
         name: "You",
         username: "you",
@@ -263,14 +245,14 @@ export default function TwitterFeed() {
       setTweets([newTweet, ...tweets]);
       setNewTweetText("");
       setIsComposing(false);
-      setSelectedMediaUrl(undefined);
-      setSelectedMediaType(undefined);
+  setSelectedMediaUrl(undefined);
+  setSelectedMediaType(undefined);
 
       // Check if AI agent is tagged
       if (newTweetText.includes('@PrizePicksAI')) {
         setTimeout(() => {
           const aiResponse: Tweet = {
-            id: `ai-${Date.now()}-${Math.random()}`, // Ensure unique ID
+            id: `ai-${Date.now()}`,
             author: {
               name: "PrizePicks AI",
               username: "PrizePicksAI",
@@ -292,7 +274,7 @@ export default function TwitterFeed() {
   };
 
   const handleLike = (tweetId: string) => {
-    setTweets(tweets.map(tweet => 
+    setTweets(tweets.map((tweet: Tweet) => 
       tweet.id === tweetId 
         ? { ...tweet, isLiked: !tweet.isLiked, likes: tweet.isLiked ? tweet.likes - 1 : tweet.likes + 1 }
         : tweet
@@ -300,19 +282,113 @@ export default function TwitterFeed() {
   };
 
   const handleRetweet = (tweetId: string) => {
-    setTweets(tweets.map(tweet => 
-      tweet.id === tweetId 
-        ? { ...tweet, isRetweeted: !tweet.isRetweeted, retweets: tweet.isRetweeted ? tweet.retweets - 1 : tweet.retweets + 1 }
-        : tweet
-    ));
+    setTweets(prev => {
+      const idx = prev.findIndex(t => t.id === tweetId);
+      if (idx === -1) return prev;
+
+      const original = prev[idx];
+
+      // If this tweet is a repost item, do nothing (or we could target original)
+      if (original.isRepost && original.repostOfId) {
+        return prev; // avoid reposting a repost card directly
+      }
+
+      const you = { by: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=you' };
+
+      // Check if you already reposted this tweet
+      const existingRtIndex = prev.findIndex(
+        (t) => t.isRepost && t.repostOfId === original.id && t.repostMeta?.username === 'you'
+      );
+
+      if (existingRtIndex !== -1) {
+        // Undo repost: remove the repost item and decrement original count/state
+        const updated = [...prev];
+        updated.splice(existingRtIndex, 1);
+        updated[idx] = {
+          ...original,
+          isRetweeted: false,
+          retweets: Math.max(0, (original.retweets || 0) - 1),
+        };
+        return updated;
+      }
+
+      // Create a new repost item and bump original counters
+      const repost: Tweet = {
+        id: `rt-${Date.now()}-${original.id}`,
+        author: original.author, // original author's identity is shown in the inner card; outer card notes who reposted
+        content: '',
+        timestamp: 'Just now',
+        likes: 0,
+        retweets: 0,
+        replies: 0,
+        isRepost: true,
+        repostOfId: original.id,
+        repostMeta: you,
+      };
+
+      const updated = [...prev];
+      // Update original tweet state
+      updated[idx] = {
+        ...original,
+        isRetweeted: true,
+        retweets: (original.retweets || 0) + 1,
+      };
+      // Prepend repost to the feed
+      updated.unshift(repost);
+      return updated;
+    });
   };
 
   const handleBookmark = (tweetId: string) => {
-    setTweets(tweets.map(tweet => 
+    setTweets(tweets.map((tweet: Tweet) => 
       tweet.id === tweetId 
         ? { ...tweet, isBookmarked: !tweet.isBookmarked }
         : tweet
     ));
+  };
+
+  const toggleReply = (tweetId: string) => {
+    setOpenReply((prev: Record<string, boolean>) => ({ ...prev, [tweetId]: !prev[tweetId] }));
+  };
+
+  const handleReplyChange = (tweetId: string, text: string) => {
+    setReplyDrafts((prev: Record<string, string>) => ({ ...prev, [tweetId]: text }));
+  };
+
+  const handleReplySubmit = (tweetId: string) => {
+    const text = (replyDrafts[tweetId] || '').trim();
+    if (!text) return;
+    setTweets(prev => {
+      const idx = prev.findIndex(t => t.id === tweetId);
+      if (idx === -1) return prev;
+      const parent = prev[idx];
+
+      const reply: Tweet = {
+        id: `reply-${Date.now()}-${tweetId}`,
+        author: { name: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=you' },
+        content: text,
+        timestamp: 'Just now',
+        likes: 0,
+        retweets: 0,
+        replies: 0,
+        isReply: true,
+        replyToId: tweetId,
+      };
+
+      // Determine insertion point: after parent and any existing replies to this parent
+      let insertAt = idx + 1;
+      while (insertAt < prev.length && prev[insertAt].isReply && prev[insertAt].replyToId === tweetId) {
+        insertAt++;
+      }
+
+      const updated = [...prev];
+      updated.splice(insertAt, 0, reply);
+      // bump parent reply count
+      updated[idx] = { ...parent, replies: (parent.replies || 0) + 1 };
+      return updated;
+    });
+    setReplyDrafts((prev: Record<string, string>) => ({ ...prev, [tweetId]: '' }));
+    setOpenReply((prev: Record<string, boolean>) => ({ ...prev, [tweetId]: false }));
   };
 
   return (
@@ -340,7 +416,7 @@ export default function TwitterFeed() {
                 <img src={selectedMediaUrl} alt="Selected media" className="w-full" />
               </div>
             )}
-            
+
             {isComposing && (
               <div className="mt-3 flex items-center justify-between">
                 <div className="flex gap-1">
@@ -388,13 +464,14 @@ export default function TwitterFeed() {
 
       {/* Feed */}
       <div className="divide-y divide-gray-800">
-        {tweets.map((tweet) => (
+        {tweets.filter(t => !t.isReply).map((tweet) => (
           <div key={tweet.id} className="p-4 hover:bg-gray-900/50 transition cursor-pointer">
             <div className="flex gap-3">
               {/* Avatar */}
-              <img 
-                src={tweet.author.avatar} 
-                alt={tweet.author.name}
+              {/* For reposts, show the reposting user's avatar; else author's */}
+              <img
+                src={(tweet.isRepost && tweet.repostMeta?.avatar) ? tweet.repostMeta.avatar : tweet.author.avatar}
+                alt={(tweet.isRepost && tweet.repostMeta?.by) ? tweet.repostMeta.by : tweet.author.name}
                 className="w-12 h-12 rounded-full flex-shrink-0"
               />
 
@@ -402,32 +479,72 @@ export default function TwitterFeed() {
               <div className="flex-1 min-w-0">
                 {/* Header */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold hover:underline">{tweet.author.name}</span>
-                  {tweet.author.verified && (
+                  {/* For reposts, header shows who reposted */}
+                  {tweet.isRepost ? (
+                    <>
+                      <span className="text-gray-400">{tweet.repostMeta?.by} reposted</span>
+                      <span className="text-gray-500">·</span>
+                      <span className="text-gray-500">{isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ''}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-bold hover:underline">{tweet.author.name}</span>
+                      {tweet.author.verified && (
                     <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/>
                     </svg>
+                      )}
+                      <span className="text-gray-500">@{tweet.author.username}</span>
+                      <span className="text-gray-500">·</span>
+                      <span className="text-gray-500">
+                        {isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ''}
+                      </span>
+                    </>
                   )}
-                  <span className="text-gray-500">@{tweet.author.username}</span>
-                  <span className="text-gray-500">·</span>
-                  <span className="text-gray-500">
-                    {isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ""}
-                  </span>
                 </div>
 
-                {/* Tweet Text */}
-                <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
-
-                {/* Media */}
-                {tweet.mediaUrl && (
-                  <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
-                    <img src={tweet.mediaUrl} alt="Tweet media" className="w-full" />
-                  </div>
+                {/* Content area */}
+                {!tweet.isRepost ? (
+                  <>
+                    <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
+                    {tweet.mediaUrl && (
+                      <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
+                        <img src={tweet.mediaUrl} alt="Tweet media" className="w-full" />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // Repost card: embed original tweet preview
+                  (() => {
+                    const original = tweets.find(t => t.id === tweet.repostOfId);
+                    if (!original) return null;
+                    return (
+                      <div className="mt-2 border border-gray-800 rounded-xl p-3 bg-black/30">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold hover:underline">{original.author.name}</span>
+                          {original.author.verified && (
+                            <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/>
+                            </svg>
+                          )}
+                          <span className="text-gray-500">@{original.author.username}</span>
+                          <span className="text-gray-500">·</span>
+                          <span className="text-gray-500">{isMounted && original.timestamp ? formatTimestamp(original.timestamp) : ''}</span>
+                        </div>
+                        <p className="mt-1 whitespace-pre-wrap break-words">{original.content}</p>
+                        {original.mediaUrl && (
+                          <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
+                            <img src={original.mediaUrl} alt="Tweet media" className="w-full" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
                 )}
 
                 {/* Actions */}
                 <div className="mt-3 flex items-center justify-between max-w-md">
-                  <button aria-label={`Reply to @${tweet.author.username}`} className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
+                  <button onClick={() => toggleReply(tweet.id)} aria-label={`Reply to @${tweet.author.username}`} className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
                     <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition">
                       <MessageCircle className="w-5 h-5" />
                     </div>
@@ -436,7 +553,7 @@ export default function TwitterFeed() {
 
                   <button 
                     aria-label={tweet.isRetweeted ? 'Undo retweet' : 'Retweet'}
-                    onClick={() => handleRetweet(tweet.id)}
+                    onClick={() => !tweet.isRepost && handleRetweet(tweet.id)}
                     className={`flex items-center gap-2 group ${tweet.isRetweeted ? 'text-green-500' : 'text-gray-500 hover:text-green-500'}`}
                   >
                     <div className="p-2 rounded-full group-hover:bg-green-500/10 transition">
@@ -465,13 +582,64 @@ export default function TwitterFeed() {
                       <Bookmark className={`w-5 h-5 ${tweet.isBookmarked ? 'fill-current' : ''}`} />
                     </div>
                   </button>
-
-                    <button aria-label="Share tweet" className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
-                    <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition">
-                      <Share className="w-5 h-5" />
-                    </div>
-                  </button>
                 </div>
+
+                {/* Reply composer */}
+                {openReply[tweet.id] && (
+                  <div className="mt-3 pl-12">
+                    <div className="flex gap-3 items-start">
+                      <img 
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=you" 
+                        alt="Your avatar" 
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <div className="flex-1">
+                        <textarea
+                          value={replyDrafts[tweet.id] || ''}
+                          onChange={(e) => handleReplyChange(tweet.id, e.target.value)}
+                          placeholder="Post your reply"
+                          className="w-full bg-transparent text-base outline-none resize-none placeholder-gray-600 border border-gray-800 rounded-lg p-2"
+                          rows={3}
+                        />
+                        <div className="mt-2 flex justify-end">
+                          <button
+                            onClick={() => handleReplySubmit(tweet.id)}
+                            disabled={!((replyDrafts[tweet.id] || '').trim())}
+                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white font-bold py-1.5 px-4 rounded-full transition"
+                          >
+                            Reply
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Replies list (nested) */}
+                {tweets.some(t => t.isReply && t.replyToId === tweet.id) && (
+                  <div className="mt-3 space-y-3">
+                    {tweets.filter(t => t.isReply && t.replyToId === tweet.id).map(r => (
+                      <div key={r.id} className="pl-12">
+                        <div className="flex gap-3">
+                          <img 
+                            src={r.author.avatar}
+                            alt={r.author.name}
+                            className="w-10 h-10 rounded-full flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold hover:underline">{r.author.name}</span>
+                              <span className="text-gray-500">@{r.author.username}</span>
+                              <span className="text-gray-500">·</span>
+                              <span className="text-gray-500">{isMounted && r.timestamp ? formatTimestamp(r.timestamp) : ''}</span>
+                            </div>
+                            <p className="mt-1 whitespace-pre-wrap break-words">{r.content}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
