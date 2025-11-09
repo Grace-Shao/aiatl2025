@@ -77,12 +77,12 @@ export default function Page() {
 
   return (
     <div className="min-h-screen h-screen overflow-hidden gradient-primary">
-      <div className="w-full mx-auto px-6 sm:px-8 pt-6 pb-0">
+      <div className="w-full mx-auto px-6 sm:px-8 pt-8 pb-0">
         {/* Top bar: HypeX left + Open Video button right */}
-        <div className="mb-2 flex items-center justify-between">
-          <div className="text-left">
-            <h1 className="ml-2 sm:ml-4 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
-              HypeX
+        <div className="mb-3 flex items-center justify-between">
+          <div className="text-left py-1">
+            <h1 className="ml-2 sm:ml-4 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-pink-400 bg-clip-text text-transparent leading-tight pb-2">
+              HypeZone
             </h1>
           </div>
           <div className="flex items-center gap-3">
@@ -106,13 +106,13 @@ export default function Page() {
         </div>
         {/* Removed back link and centered title as requested */}
 
-  {/* Side-by-side layout: left timeline + right social feed; extra top margin */}
-  <div className="w-full flex flex-col lg:flex-row items-start gap-6 mt-4 h-[calc(100vh-150px)]">
+  {/* Side-by-side layout: left timeline + right social feed */}
+  <div className="w-full flex flex-col lg:flex-row items-start gap-6 h-[calc(100vh-150px)] -mt-2">
           {/* Left column: tracker + timeline (auto height, not stretched) */}
-          <div className="w-full lg:w-1/2 lg:shrink-0 space-y-4 px-2 lg:px-4 lg:self-center overflow-hidden">
-            {/* Section title + tagline above timeline */}
-            <div className="pl-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Live Hype Feed & Timeline</h2>
+          <div className="w-full lg:w-1/2 lg:shrink-0 space-y-3 px-2 lg:px-4 lg:self-center overflow-hidden">
+            {/* Section title + tagline above timeline - centered */}
+            <div className="text-center -mt-1">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white">Live Hype Feed & Timeline</h2>
               <p className="mt-1 text-base sm:text-lg text-gray-300/90">Real-time sports hype engine — moments, stats, and memes in one stream.</p>
             </div>
             {/* Game Event Tracker - Shows recent events and auto-posts to forum */}
