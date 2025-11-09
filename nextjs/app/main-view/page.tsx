@@ -70,8 +70,49 @@ export default function Page() {
     if (newWindow) {
       setVideoWindow(newWindow)
       console.log("[v0] Video window opened")
+      return newWindow
     } else {
       console.log("[v0] Failed to open video window - popup might be blocked")
+    }
+
+    return null
+  }
+
+  const sendVideoCommand = (command: "VIDEO_COMMAND_PLAY" | "VIDEO_COMMAND_PAUSE") => {
+    if (videoWindow && !videoWindow.closed) {
+      videoWindow.postMessage({ type: command }, window.location.origin)
+      return true
+    }
+    return false
+  }
+
+  const handleStartClock = () => {
+    let targetWindow = videoWindow
+    let windowJustOpened = false
+
+    if (!targetWindow || targetWindow.closed) {
+      targetWindow = openVideoWindow()
+      windowJustOpened = !!targetWindow
+    }
+
+    if (!targetWindow) {
+      console.warn("[v0] Unable to start clock - video window not available")
+      return
+    }
+
+    const postPlay = () => targetWindow?.postMessage({ type: "VIDEO_COMMAND_PLAY" }, window.location.origin)
+
+    if (windowJustOpened) {
+      setTimeout(postPlay, 750)
+    } else {
+      postPlay()
+    }
+  }
+
+  const handleStopClock = () => {
+    const paused = sendVideoCommand("VIDEO_COMMAND_PAUSE")
+    if (!paused) {
+      console.warn("[v0] Unable to pause clock - video window not available")
     }
   }
 
@@ -129,6 +170,8 @@ export default function Page() {
               duration={duration}
               isPlaying={isPlaying}
               onNewMoment={setCurrentKeyMoment}
+              onStartClock={handleStartClock}
+              onStopClock={handleStopClock}
             />
           </div>
 

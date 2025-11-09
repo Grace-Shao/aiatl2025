@@ -16,6 +16,7 @@ export class KeyMomentsConnector {
   private onNewMomentCallback?: (moment: TimelineKeyMoment) => void
   private keyMomentsHook?: ReturnType<typeof useKeyMoments>
   private currentTime = 0
+  private processedMomentIds = new Set<string>()
 
   constructor() {
     console.log('🔧 KeyMomentsConnector initialized')
@@ -40,14 +41,19 @@ export class KeyMomentsConnector {
    */
   private convertToTimelineFormat(apiMoment: APIKeyMoment): TimelineKeyMoment {
     // Position moment relative to current time + some spacing
-    const momentTime = this.currentTime + (apiMoment.detected_at * 5)
+    const rawTimestamp = typeof apiMoment.timestamp === 'string'
+      ? parseFloat(apiMoment.timestamp)
+      : apiMoment.timestamp
+
+    const baseTime = Number.isFinite(rawTimestamp) ? rawTimestamp : this.currentTime
+    const momentTime = Math.max(0, baseTime)
     
     return {
       id: apiMoment.id,
       time: momentTime,
       title: apiMoment.play_category,
       description: apiMoment.description,
-      videoStart: momentTime - 2,
+      videoStart: Math.max(0, momentTime - 3),
       videoEnd: momentTime + 3,
       addedAt: Date.now(),
       score: apiMoment.combined_score,
@@ -63,6 +69,12 @@ export class KeyMomentsConnector {
     
     // Process new key moments as they arrive
     keyMomentsHook.keyMoments.forEach(apiMoment => {
+      if (!apiMoment.id || this.processedMomentIds.has(apiMoment.id)) {
+        return
+      }
+
+      this.processedMomentIds.add(apiMoment.id)
+
       if (this.onNewMomentCallback) {
         const timelineMoment = this.convertToTimelineFormat(apiMoment)
         console.log('🎯 New key moment converted for timeline:', timelineMoment.title, 
@@ -119,6 +131,7 @@ export class KeyMomentsConnector {
    * Reset the connector
    */
   reset() {
+    this.processedMomentIds.clear()
     if (this.keyMomentsHook) {
       this.keyMomentsHook.reset()
     }

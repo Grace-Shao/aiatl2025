@@ -17,6 +17,8 @@ export function VideoPlayer({ onTimeUpdate, onDurationChange, onPlayStateChange 
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [isReady, setIsReady] = useState(false)
+  const isReadyRef = useRef(false)
+  const pendingCommandRef = useRef<"play" | "pause" | null>(null)
 
   const onTimeUpdateRef = useRef(onTimeUpdate)
   const onDurationChangeRef = useRef(onDurationChange)
@@ -63,9 +65,18 @@ export function VideoPlayer({ onTimeUpdate, onDurationChange, onPlayStateChange 
             console.log("[v0] YouTube player ready")
             playerRef.current = event.target
             setIsReady(true)
+            isReadyRef.current = true
             const duration = event.target.getDuration()
             console.log("[v0] Video duration:", duration)
             onDurationChangeRef.current?.(duration)
+
+            if (pendingCommandRef.current === "play") {
+              playerRef.current.playVideo()
+              pendingCommandRef.current = null
+            } else if (pendingCommandRef.current === "pause") {
+              playerRef.current.pauseVideo()
+              pendingCommandRef.current = null
+            }
           },
           onStateChange: (event: any) => {
             const playing = event.data === (window as any).YT.PlayerState.PLAYING
@@ -128,6 +139,34 @@ export function VideoPlayer({ onTimeUpdate, onDurationChange, onPlayStateChange 
       setIsMuted(true)
     }
   }
+
+  useEffect(() => {
+    const handleIncomingCommand = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) {
+        console.log("[v0] Ignoring message from origin:", event.origin)
+        return
+      }
+
+      const { type } = event.data || {}
+
+      if (type === "VIDEO_COMMAND_PLAY") {
+        if (playerRef.current && isReadyRef.current) {
+          playerRef.current.playVideo()
+        } else {
+          pendingCommandRef.current = "play"
+        }
+      } else if (type === "VIDEO_COMMAND_PAUSE") {
+        if (playerRef.current && isReadyRef.current) {
+          playerRef.current.pauseVideo()
+        } else {
+          pendingCommandRef.current = "pause"
+        }
+      }
+    }
+
+    window.addEventListener("message", handleIncomingCommand)
+    return () => window.removeEventListener("message", handleIncomingCommand)
+  }, [])
 
   return (
     <Card className="overflow-hidden">

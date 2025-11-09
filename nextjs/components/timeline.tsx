@@ -1,14 +1,19 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useState, useRef, useEffect } from "react"
+import { useKeyMomentsConnector } from "@/lib/keyMomentsConnector"
+import { Flame } from "lucide-react"
 
 interface TimelineProps {
   currentTime: number
   duration: number
   isPlaying: boolean
   onNewMoment?: (moment: { id: string; time: number; title: string; description: string }) => void
+  onStartClock?: () => void
+  onStopClock?: () => void
 }
 
 interface KeyMoment {
@@ -19,6 +24,8 @@ interface KeyMoment {
   videoStart: number
   videoEnd: number
   addedAt?: number
+  score?: number
+  category?: string
 }
 
 const PREDEFINED_MOMENTS: Omit<KeyMoment, "addedAt">[] = [
@@ -48,11 +55,79 @@ const PREDEFINED_MOMENTS: Omit<KeyMoment, "addedAt">[] = [
   },
 ]
 
-export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: TimelineProps) {
+export function Timeline({ currentTime, duration, isPlaying, onNewMoment, onStartClock, onStopClock }: TimelineProps) {
   const [selectedMoment, setSelectedMoment] = useState<KeyMoment | null>(null)
   const [visibleMoments, setVisibleMoments] = useState<KeyMoment[]>([])
+  const [isDetectionActive, setIsDetectionActive] = useState(false)
   const timelineRef = useRef<HTMLDivElement>(null)
   const triggeredMomentsRef = useRef<Set<string>>(new Set())
+  const processedMomentIdsRef = useRef<Set<string>>(new Set())
+  const { connector, isConnected, error, stats } = useKeyMomentsConnector()
+
+  useEffect(() => {
+    const handleNewMoment = (moment: KeyMoment) => {
+      if (processedMomentIdsRef.current.has(moment.id)) {
+        return
+      }
+
+      processedMomentIdsRef.current.add(moment.id)
+
+      setVisibleMoments((prev) => {
+        if (prev.find((m) => m.id === moment.id)) {
+          return prev
+        }
+
+        const enrichedMoment: KeyMoment = { ...moment, addedAt: Date.now() }
+        return [...prev, enrichedMoment].sort((a, b) => a.time - b.time)
+      })
+
+      onNewMoment?.({
+        id: moment.id,
+        time: moment.time,
+        title: moment.title,
+        description: moment.description,
+      })
+    }
+
+    connector.setOnNewMoment(handleNewMoment)
+
+    return () => {
+      connector.setOnNewMoment(() => {})
+    }
+  }, [connector, onNewMoment])
+
+  useEffect(() => {
+    if (isDetectionActive) {
+      connector.updateCurrentTime(currentTime)
+    }
+  }, [connector, currentTime, isDetectionActive])
+
+  useEffect(() => {
+    return () => {
+      connector.stop()
+      connector.reset()
+      processedMomentIdsRef.current.clear()
+    }
+  }, [connector])
+
+  const handleStartDetection = () => {
+    if (isDetectionActive) return
+
+    connector.reset()
+    processedMomentIdsRef.current.clear()
+    connector.updateCurrentTime(currentTime)
+    connector.start()
+    setIsDetectionActive(true)
+    onStartClock?.()
+  }
+
+  const handleStopDetection = () => {
+    connector.stop()
+    connector.reset()
+    processedMomentIdsRef.current.clear()
+    setIsDetectionActive(false)
+    onStopClock?.()
+  }
 
   useEffect(() => {
     PREDEFINED_MOMENTS.forEach((moment) => {
@@ -62,7 +137,7 @@ export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: Time
           if (prev.find((m) => m.id === moment.id)) {
             return prev
           }
-          
+
           console.log("[v0] Adding key moment at", moment.time, "seconds:", moment.title)
           const newMoment = { ...moment, addedAt: Date.now() }
           return [...prev, newMoment].sort((a, b) => a.time - b.time)
@@ -100,6 +175,10 @@ export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: Time
   }
 
   const latestMoment = visibleMoments.length > 0 ? visibleMoments[visibleMoments.length - 1] : null
+  const liveMomentsCount = visibleMoments.length
+  const hypeLevel = Math.min(100, liveMomentsCount * 25 + (isDetectionActive ? 20 : 0))
+  const hypeDescriptor = hypeLevel >= 80 ? "On fire" : hypeLevel >= 50 ? "Heating up" : "Warming up"
+  const detectedMoments = stats?.total_detected ?? liveMomentsCount
 
   const isMomentNew = (moment: KeyMoment) => {
     if (!moment.addedAt) return false
@@ -119,12 +198,47 @@ export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: Time
               </>
             )}
             {!isPlaying && "Paused"}
+            <span className="ml-3 text-xs">
+              {isConnected ? "Detector connected" : "Detector offline"}
+              {error && ` · ${error}`}
+            </span>
           </p>
         </div>
         <div className="text-right">
           <div className="text-3xl font-bold text-primary">{formatTime(currentTime)}</div>
           <div className="text-xs text-muted-foreground">Current Time</div>
         </div>
+      </div>
+
+      <div className="mb-4">
+        <div className="flex items-center justify-between gap-4 rounded-lg border border-orange-400/20 bg-orange-500/10 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className={`relative flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/20 ${
+              isDetectionActive ? "animate-pulse" : ""
+            }`}>
+              {isDetectionActive && <span className="absolute inset-0 rounded-full bg-orange-500/20 blur-md" />}
+              <Flame className={`h-5 w-5 text-orange-400 ${isDetectionActive ? "drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]" : ""}`} />
+            </div>
+            <div>
+              <div className="text-xs uppercase tracking-[0.12em] text-orange-300/80">Hype meter</div>
+              <div className="text-sm font-semibold text-orange-100">
+                {Math.round(hypeLevel)}% heat · {hypeDescriptor}
+              </div>
+            </div>
+          </div>
+          <div className="text-xs text-orange-200/80">
+            {detectedMoments || liveMomentsCount} live moments tracked
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <Button onClick={handleStartDetection} disabled={isDetectionActive}>
+          {isDetectionActive ? "Detection Running" : "Start Key Moment Detection"}
+        </Button>
+        <Button variant="outline" onClick={handleStopDetection} disabled={!isDetectionActive}>
+          Stop Detection
+        </Button>
       </div>
 
       <div className="relative mb-6">
@@ -175,49 +289,82 @@ export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: Time
                 return (
                   <button
                     key={moment.id}
-                  onClick={() => setSelectedMoment(moment)}
-                  className="absolute top-2 transform -translate-x-1/2 cursor-pointer group z-10 transition-all duration-200"
-                  style={{ left: getMarkerLeftPosition(moment.time) }}
+                    onClick={() => setSelectedMoment(moment)}
+                    className="absolute top-2 transform -translate-x-1/2 cursor-pointer group z-10 flex flex-col items-center gap-1 transition-all duration-200"
+                    style={{ left: getMarkerLeftPosition(moment.time) }}
                 >
                   {showAnimation && (
-                    <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap animate-pulse">
+                    <div className="absolute -top-8 mb-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap animate-pulse">
                       <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                         Latest key moment
                       </div>
-                      {/* Arrow pointing down */}
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
                         <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-pink-500" />
                       </div>
                     </div>
                   )}
 
-                  {showAnimation && (
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full border-4 border-red-500/60 animate-ping-upward" />
-                      </div>
+                  <div className="relative flex flex-col items-center">
+                    <div className="relative flex h-12 w-12 items-center justify-center">
+                      <span
+                        className={`absolute h-12 w-12 rounded-full bg-red-500/20 blur-xl transition-opacity ${
+                          isLatest ? "opacity-90" : "opacity-40"
+                        }`}
+                      />
+                      <span
+                        className={`absolute h-10 w-10 rounded-full bg-orange-500/30 blur-md transition-transform duration-300 ${
+                          showAnimation ? "scale-110" : ""
+                        }`}
+                      />
+                      <Flame
+                        className={`relative h-8 w-8 text-orange-400 drop-shadow-[0_0_12px_rgba(249,115,22,0.55)] ${
+                          showAnimation ? "animate-[pulse_1.2s_ease-in-out_infinite]" : ""
+                        }`}
+                        strokeWidth={1.5}
+                      />
                     </div>
-                  )}
 
-                  <svg
-                    width={showAnimation ? "32" : "24"}
-                    height={showAnimation ? "42" : "32"}
-                    viewBox="0 0 24 32"
-                    fill="none"
-                    className={`drop-shadow-lg transition-all duration-500 ${
-                      showAnimation ? "animate-[bounce_1s_ease-in-out_3]" : ""
-                    } group-hover:scale-125 group-hover:-translate-y-1`}
-                    style={{
-                      filter: showAnimation ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))" : undefined,
-                    }}
-                  >
-                    <path
-                      d="M12 0C12 0 0 12 0 20C0 26.6274 5.37258 32 12 32C18.6274 32 24 26.6274 24 20C24 12 12 0 12 0Z"
-                      fill="#EF4444"
-                    />
-                    <circle cx="12" cy="20" r="4" fill="white" fillOpacity="0.4" />
-                  </svg>
-                  {/* Tooltip */}
+                    {showAnimation && (
+                      <div className="absolute top-2 left-1/2 -translate-x-1/2">
+                        <div className="w-10 h-10 rounded-full border-4 border-red-500/40 animate-ping" />
+                      </div>
+                    )}
+
+                    <svg
+                      width={showAnimation ? "34" : "26"}
+                      height={showAnimation ? "40" : "32"}
+                      viewBox="0 0 24 32"
+                      fill="none"
+                      className={`relative drop-shadow-lg transition-all duration-500 ${
+                        showAnimation ? "animate-[bounce_1s_ease-in-out_3]" : ""
+                      } group-hover:scale-125 group-hover:-translate-y-1`}
+                      style={{
+                        filter: showAnimation ? "drop-shadow(0 0 12px rgba(249, 115, 22, 0.85))" : "drop-shadow(0 0 6px rgba(249,115,22,0.4))",
+                      }}
+                    >
+                      <defs>
+                        <linearGradient id={`flame-fill-${moment.id}`} x1="12" y1="0" x2="12" y2="32" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="#fb923c" />
+                          <stop offset="55%" stopColor="#f97316" />
+                          <stop offset="100%" stopColor="#dc2626" />
+                        </linearGradient>
+                        <radialGradient id={`flame-core-${moment.id}`} cx="12" cy="20" r="6" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="#fde68a" />
+                          <stop offset="70%" stopColor="#fb923c" stopOpacity="0.7" />
+                          <stop offset="100%" stopColor="#f97316" stopOpacity="0.3" />
+                        </radialGradient>
+                      </defs>
+                      <path
+                        d="M12 0C12 0 0 12 0 20C0 26.6274 5.37258 32 12 32C18.6274 32 24 26.6274 24 20C24 12 12 0 12 0Z"
+                        fill={`url(#flame-fill-${moment.id})`}
+                      />
+                      <path
+                        d="M12 6C12 6 5 13 5 19C5 23.9706 8.02944 27 12 27C15.9706 27 19 23.9706 19 19C19 13 12 6 12 6Z"
+                        fill={`url(#flame-core-${moment.id})`}
+                      />
+                    </svg>
+                  </div>
+
                   <div className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                     <div className="bg-black/90 text-white text-xs px-2 py-1 rounded shadow-lg">{moment.title}</div>
                   </div>
