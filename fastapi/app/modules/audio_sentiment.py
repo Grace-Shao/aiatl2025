@@ -32,9 +32,59 @@ emotion_pipe = pipeline(
 
 SAMPLE_RATE = 16000
 
-def score_clip(path):
+def score_clip(path_or_audio, sr=None):
+    """
+    Score audio clip from either file path or raw audio array.
+    
+    Args:
+        path_or_audio: Either a file path (str) or audio array (numpy array or bytes)
+        sr: Sample rate (required if passing raw audio)
+    
+    Returns:
+        Dict with emotion scores and energy
+    """
     # 1) Load audio at 16k mono
-    audio, sr = librosa.load(path, sr=SAMPLE_RATE, mono=True)
+    if isinstance(path_or_audio, str):
+        # Load from file
+        audio, sr = librosa.load(path_or_audio, sr=SAMPLE_RATE, mono=True)
+        path = path_or_audio
+    elif isinstance(path_or_audio, (bytes, bytearray)):
+        # Convert bytes to numpy array (assuming WAV format)
+        import io
+        import wave
+        
+        # Read WAV from bytes
+        with wave.open(io.BytesIO(bytes(path_or_audio)), 'rb') as wav_file:
+            sr = wav_file.getframerate()
+            n_frames = wav_file.getnframes()
+            audio_bytes = wav_file.readframes(n_frames)
+            
+            # Convert to numpy array
+            if wav_file.getsampwidth() == 2:  # 16-bit
+                audio = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+            elif wav_file.getsampwidth() == 4:  # 32-bit
+                audio = np.frombuffer(audio_bytes, dtype=np.int32).astype(np.float32) / 2147483648.0
+            else:
+                audio = np.frombuffer(audio_bytes, dtype=np.uint8).astype(np.float32) / 128.0 - 1.0
+            
+            # Convert stereo to mono if needed
+            if wav_file.getnchannels() == 2:
+                audio = audio.reshape(-1, 2).mean(axis=1)
+        
+        # Resample if needed
+        if sr != SAMPLE_RATE:
+            audio = librosa.resample(audio, orig_sr=sr, target_sr=SAMPLE_RATE)
+        path = "stream_audio"
+    else:
+        # Assume numpy array
+        audio = np.array(path_or_audio)
+        if len(audio.shape) > 1:
+            audio = np.mean(audio, axis=1)  # Convert to mono
+        # Resample if needed
+        if sr and sr != SAMPLE_RATE:
+            audio = librosa.resample(audio, orig_sr=sr, target_sr=SAMPLE_RATE)
+        path = "raw_audio"
+    
     inp = {"array": audio, "sampling_rate": SAMPLE_RATE}
 
     # 2) Audio → emotion

@@ -21,10 +21,10 @@ async def main():
     
     # Run detection at 100x speed
     key_moments = await process_streams_for_key_moments(
-        speed=100.0,
-        audio_weight=0.3,
-        play_weight=0.7,
-        key_moment_threshold=50.0  # Lower threshold to catch more moments
+        speed=50.0,
+        audio_weight=0.2,
+        play_weight=0.8,
+        key_moment_threshold=45.0  # Lower threshold to catch more moments
     )
     
     # Print summary
@@ -43,7 +43,7 @@ async def main():
         print(f"\n{i}. Time: {moment.timestamp:.1f}s (Q{moment.play_data.get('quarter')})")
         print(f"   Combined Score: {moment.combined_score:.1f}")
         print(f"   Play: {moment.play_score:.1f} ({moment.play_category})")
-        print(f"   Audio: {moment.audio_excitement:.1f}")
+        print(f"   Audio: {moment.audio_score:.1f}")
         print(f"   {moment.play_data.get('Description', 'N/A')}")
     
     # Export to file
