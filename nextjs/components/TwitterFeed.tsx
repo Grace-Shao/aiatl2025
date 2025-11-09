@@ -285,6 +285,19 @@ export default function TwitterFeed() {
             replies: 0,
           };
 
+          // Save AI response to database
+          await fetch('/api/forum/threads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: aiContent.substring(0, 100),
+              content: aiContent,
+              author: 'PrizePicks AI',
+              mediaUrl: aiMediaUrl,
+              mediaType: aiMediaUrl ? (aiMediaUrl.includes('.gif') ? 'gif' : 'image') : undefined,
+            }),
+          });
+
           setTweets(prev => [aiResponse, ...prev]);
         } catch (err) {
           console.error('Failed to call orchestrator:', err);
