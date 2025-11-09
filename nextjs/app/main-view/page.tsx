@@ -82,7 +82,7 @@ export default function Page() {
         <div className="mb-2 flex items-center justify-between">
           <div className="text-left">
             <h1 className="ml-2 sm:ml-4 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
-              HypeX
+              HypeZone
             </h1>
           </div>
           <div className="flex items-center gap-3">

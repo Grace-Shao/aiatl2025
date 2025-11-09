@@ -9,9 +9,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
     }
 
+    // Extract optional context (currentQuarter, timestamp, etc.)
+    const context = body?.context || {};
+    
     console.log('Orchestrator route received prompt:', prompt);
+    console.log('Orchestrator route received context:', context);
+    
     const orchestrator = new Orchestrator();
-    const result = await orchestrator.handlePrompt(prompt);
+    const result = await orchestrator.handlePrompt(prompt, context);
 
     console.log('Orchestrator result:', result);
 

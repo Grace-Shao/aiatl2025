@@ -9,6 +9,7 @@ export class Orchestrator {
       memeGenerator: new MemeGeneratorAgent(),
       factChecker: new FactCheckingAgent(),
       opinionGenerator: new OpinionAgent(),
+      gameStatistics: new GameStatisticsAgent(),
     };
   }
 
@@ -18,13 +19,32 @@ export class Orchestrator {
    * @returns {string} - The identified task.
    */
   parsePrompt(prompt: string): string {
-    if (prompt.includes('meme')) {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    console.log('Parsing prompt:', prompt);
+    console.log('Lower case:', lowerPrompt);
+    
+    if (lowerPrompt.includes('meme')) {
+      console.log('Matched: memeGenerator');
       return 'memeGenerator';
-    } else if (prompt.includes('fact check')) {
+    } else if (lowerPrompt.includes('fact check')) {
+      console.log('Matched: factChecker');
       return 'factChecker';
-    } else if (prompt.includes('opinion') || prompt.includes('prediction')) {
+    } else if (lowerPrompt.includes('opinion') || lowerPrompt.includes('prediction')) {
+      console.log('Matched: opinionGenerator');
       return 'opinionGenerator';
+    } else if (
+      lowerPrompt.includes('stat') || 
+      lowerPrompt.includes('yard') || 
+      lowerPrompt.includes('score') ||
+      lowerPrompt.includes('how many') ||
+      lowerPrompt.includes('rush') ||
+      lowerPrompt.includes('pass')
+    ) {
+      console.log('Matched: gameStatistics');
+      return 'gameStatistics';
     } else {
+      console.log('No match found!');
       throw new Error('Unknown task in prompt');
     }
   }
@@ -33,12 +53,17 @@ export class Orchestrator {
    * Routes the task to the appropriate agent/tool.
    * @param {string} task - The task to perform.
    * @param {string} prompt - The user input.
+   * @param {any} context - Optional context (e.g., currentQuarter, timestamp).
    * @returns {Promise<any>} - The result from the agent/tool.
    */
-  async routeTask(task: string, prompt: string): Promise<any> {
+  async routeTask(task: string, prompt: string, context?: any): Promise<any> {
     const agent = this.agents[task];
     if (!agent) {
       throw new Error(`Agent for task ${task} not found`);
+    }
+    // Pass context to agents that support it (like GameStatisticsAgent)
+    if (context && typeof agent.handlePrompt === 'function') {
+      return await agent.handlePrompt(prompt, context);
     }
     return await agent.handlePrompt(prompt);
   }
@@ -46,12 +71,13 @@ export class Orchestrator {
   /**
    * Main entry point for handling user prompts.
    * @param {string} prompt - The user input starting with @PrizePicksAI.
+   * @param {any} context - Optional context (e.g., currentQuarter, timestamp).
    * @returns {Promise<any>} - The result from the orchestrated workflow.
    */
-  async handlePrompt(prompt: string): Promise<any> {
+  async handlePrompt(prompt: string, context?: any): Promise<any> {
     try {
       const task = this.parsePrompt(prompt);
-      return await this.routeTask(task, prompt);
+      return await this.routeTask(task, prompt, context);
     } catch (error) {
       console.error('Error handling prompt:', error);
       throw error;
@@ -306,6 +332,97 @@ Provide a SHORT, BRIEF analysis (3-4 sentences MAX) in PLAIN TEXT (NO MARKDOWN):
     } catch (error) {
       console.error('Error generating opinion:', error);
       return `Unable to generate opinion at this time: ${error}`;
+    }
+  }
+}
+
+class GameStatisticsAgent {
+  async handlePrompt(prompt: string, context?: { currentQuarter?: number; timestamp?: string }): Promise<string> {
+    console.log('GameStatisticsAgent.handlePrompt called with:', prompt, 'context:', context);
+    const stats = await this.getGameStatistics(prompt, context);
+    console.log('GameStatisticsAgent returning:', stats);
+    return stats;
+  }
+
+  private async getGameStatistics(
+    prompt: string, 
+    context?: { currentQuarter?: number; timestamp?: string }
+  ): Promise<string> {
+    console.log('getGameStatistics called with prompt:', prompt, 'context:', context);
+    
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not set');
+    }
+
+    try {
+      // Default to end of game (Quarter 4) if not specified
+      const currentQuarter = context?.currentQuarter ?? 4;
+      const isLiveGame = currentQuarter < 4;
+      
+      console.log(`Fetching game data for Quarter ${currentQuarter}...`);
+      
+      // Fetch game data for context
+      const gameDataRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/game-data`);
+      const gameData = await gameDataRes.json();
+
+      console.log('Analyzing game statistics with game data:', gameData);
+
+      // Build temporal context for Gemini
+      const temporalContext = isLiveGame 
+        ? `IMPORTANT: This is during Quarter ${currentQuarter} of the game. You can ONLY use data available up to and during Quarter ${currentQuarter}. Do NOT provide information about future quarters or final game results.`
+        : `This is the final game data (end of Quarter 4).`;
+
+      // Use Gemini to answer statistics questions
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { 
+                    text: `You are a sports statistics analyst. Use the following game data to answer the statistics question:
+
+${temporalContext}
+
+Question: ${prompt}
+
+Game Data: ${JSON.stringify(gameData, null, 2)}
+
+Provide a SHORT, CONCISE answer (2-3 sentences MAX) in PLAIN TEXT (NO MARKDOWN):
+- Use 📊 for statistics and 🏈 for football-specific insights
+- NO asterisks, NO bold formatting, NO markdown syntax
+- Just use emojis and plain text
+- Cite specific numbers and stats from the data
+- Write naturally like a tweet
+${isLiveGame ? '- Remember: only reference data from quarters that have been played so far!' : ''}` 
+                  }
+                ]
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Gemini API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const statistics = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+      if (!statistics) {
+        throw new Error('No statistics response from Gemini');
+      }
+
+      return statistics;
+    } catch (error) {
+      console.error('Error analyzing game statistics:', error);
+      return `Unable to retrieve game statistics at this time: ${error}`;
     }
   }
 }
