@@ -172,31 +172,140 @@ class MemeGeneratorAgent {
 
 class FactCheckingAgent {
   async handlePrompt(prompt: string): Promise<string> {
-    // Logic for fact-checking
     const facts = await this.checkFacts(prompt);
-    return `Fact-checked result: ${facts}`;
+    return facts;
   }
 
   private async checkFacts(prompt: string): Promise<string> {
-    // Simulate fact-checking logic
-    return `Verified facts for: ${prompt}`;
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not set');
+    }
+
+    try {
+      // Fetch game data for context
+      const gameDataRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/game-data`);
+      const gameData = await gameDataRes.json();
+
+      console.log('Fact checking with game data:', gameData);
+
+      // Use Gemini to fact-check with real data
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { 
+                    text: `You are a sports fact-checker. Use the following game data to fact-check this statement:
+
+Statement: ${prompt}
+
+Game Data: ${JSON.stringify(gameData, null, 2)}
+
+Provide a SHORT, BRIEF fact-check (2-3 sentences MAX) in PLAIN TEXT (NO MARKDOWN):
+- Use ✅ for TRUE or ❌ for FALSE
+- NO asterisks, NO bold formatting, NO markdown syntax
+- Just use emojis and plain text
+- Keep it concise and cite specific numbers from the data
+- Write naturally like a tweet` 
+                  }
+                ]
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Gemini API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const factCheck = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+      if (!factCheck) {
+        throw new Error('No fact-check response from Gemini');
+      }
+
+      return factCheck;
+    } catch (error) {
+      console.error('Error fact-checking:', error);
+      return `Unable to fact-check at this time: ${error}`;
+    }
   }
 }
 
 class OpinionAgent {
   async handlePrompt(prompt: string): Promise<string> {
-    // Logic for generating opinions/predictions using Gemini
     const opinion = await this.generateOpinion(prompt);
-    return `Opinion/Prediction: ${opinion}`;
+    return opinion;
   }
 
   private async generateOpinion(prompt: string): Promise<string> {
-    // Simulate API call to Gemini
     if (!GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY is not set');
     }
 
-    // Replace with actual API call logic
-    return `Insight based on: ${prompt}`;
+    try {
+      // Fetch game data for context
+      const gameDataRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/game-data`);
+      const gameData = await gameDataRes.json();
+
+      console.log('Generating opinion with game data:', gameData);
+
+      // Use Gemini to generate opinions/predictions
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { 
+                    text: `You are a sports analyst giving opinions and predictions. Use the following game data to provide an informed opinion:
+
+Question: ${prompt}
+
+Game Data: ${JSON.stringify(gameData, null, 2)}
+
+Provide a SHORT, BRIEF analysis (3-4 sentences MAX) in PLAIN TEXT (NO MARKDOWN):
+- Start with a clear prediction using 🏆 or 📊 emojis
+- NO asterisks, NO bold formatting, NO bullet points, NO markdown syntax
+- Just use emojis and plain text
+- Write naturally like a tweet with line breaks for readability
+- Keep it punchy and engaging` 
+                  }
+                ]
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Gemini API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const opinion = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+      if (!opinion) {
+        throw new Error('No opinion response from Gemini');
+      }
+
+      return opinion;
+    } catch (error) {
+      console.error('Error generating opinion:', error);
+      return `Unable to generate opinion at this time: ${error}`;
+    }
   }
 }
