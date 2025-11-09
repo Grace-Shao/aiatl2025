@@ -3,8 +3,6 @@ import { MongoClient, Db, Collection } from 'mongodb';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const DB_NAME = process.env.MONGODB_DB || 'forum';
 
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
-console.log('GEMINI_API_KEY:', process.env.GEMINI_API_KEY);
 
 type Comment = {
   id: string;

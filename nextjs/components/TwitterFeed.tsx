@@ -248,25 +248,53 @@ export default function TwitterFeed() {
   setSelectedMediaUrl(undefined);
   setSelectedMediaType(undefined);
 
-      // Check if AI agent is tagged
+      // Check if AI agent is tagged -> call server-side Orchestrator
       if (newTweetText.includes('@PrizePicksAI')) {
-        setTimeout(() => {
+        try {
+          console.log('Calling /api/ai/orchestrate with prompt:', newTweetText);
+          const res = await fetch('/api/ai/orchestrate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: newTweetText }),
+          });
+
+          const json = await res.json();
+          console.log('Orchestrator response:', json);
+
+          const raw = json?.result ?? json?.error ?? 'No response from agent';
+          
+          // Parse the result to extract text and imageUrl
+          let content = '';
+          let mediaUrl: string | undefined = undefined;
+          
+          try {
+            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            content = parsed.text || 'Check out this meme! 🔥';
+            mediaUrl = parsed.imageUrl;
+          } catch {
+            content = typeof raw === 'string' ? raw : JSON.stringify(raw);
+          }
+
           const aiResponse: Tweet = {
-            id: `ai-${Date.now()}`,
+            id: `ai-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             author: {
               name: "PrizePicks AI",
               username: "PrizePicksAI",
               avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AI",
               verified: true,
             },
-            content: `Based on today's matchup, I'm seeing strong value on these picks:\n\n🏀 LeBron James - OVER 26.5 points\n🏈 Travis Kelce - OVER 65.5 receiving yards\n⚾ Aaron Judge - OVER 1.5 total bases\n\nConfidence: 🔥🔥🔥`,
+            content,
+            mediaUrl,
             timestamp: "Just now",
             likes: 0,
             retweets: 0,
             replies: 0,
           };
+
           setTweets(prev => [aiResponse, ...prev]);
-        }, 2000);
+        } catch (err) {
+          console.error('Failed to call orchestrator:', err);
+        }
       }
     } catch (error) {
       console.error('Failed to post tweet:', error);
