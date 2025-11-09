@@ -15,41 +15,62 @@ export class Orchestrator {
   }
 
   /**
-   * Parses the user prompt and determines the task.
-   * @param {string} prompt - The user input starting with @PrizePicksAI.
-   * @returns {string} - The identified task.
+   * LLM-based task router - uses Gemini to understand intent
    */
-  parsePrompt(prompt: string): string {
-    const lowerPrompt = prompt.toLowerCase();
-    
-    console.log('Parsing prompt:', prompt);
-    console.log('Lower case:', lowerPrompt);
-    
-    if (lowerPrompt.includes('meme')) {
-      console.log('Matched: memeGenerator');
-      return 'memeGenerator';
-    } else if (lowerPrompt.includes('fact check')) {
-      console.log('Matched: factChecker');
-      return 'factChecker';
-    } else if (lowerPrompt.includes('email') || lowerPrompt.includes('send') && lowerPrompt.includes('friend')) {
-      console.log('Matched: emailSender');
-      return 'emailSender';
-    } else if (lowerPrompt.includes('opinion') || lowerPrompt.includes('prediction')) {
-      console.log('Matched: opinionGenerator');
-      return 'opinionGenerator';
-    } else if (
-      lowerPrompt.includes('stat') || 
-      lowerPrompt.includes('yard') || 
-      lowerPrompt.includes('score') ||
-      lowerPrompt.includes('how many') ||
-      lowerPrompt.includes('rush') ||
-      lowerPrompt.includes('pass')
-    ) {
-      console.log('Matched: gameStatistics');
-      return 'gameStatistics';
-    } else {
-      console.log('No match found!');
-      throw new Error('Unknown task in prompt');
+  async parsePrompt(prompt: string): Promise<string> {
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not set');
+    }
+
+    const taskList = `
+Available tasks:
+- memeGenerator: Generate funny sports memes
+- factChecker: Fact check sports statements
+- opinionGenerator: Give opinions and predictions about the game
+- gameStatistics: Answer questions about game stats, yards, scores, players
+`;
+
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { 
+                    text: `Given this user prompt: "${prompt}"
+
+${taskList}
+
+Which task should handle this? Respond with ONLY the task name, nothing else.` 
+                  }
+                ]
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Gemini API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const taskName = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+      if (!taskName || !this.agents[taskName]) {
+        throw new Error('Unknown task in prompt');
+      }
+
+      return taskName;
+    } catch (error) {
+      console.error('LLM routing error:', error);
+      throw new Error('Failed to route prompt');
     }
   }
 
@@ -80,7 +101,7 @@ export class Orchestrator {
    */
   async handlePrompt(prompt: string, context?: any): Promise<any> {
     try {
-      const task = this.parsePrompt(prompt);
+      const task = await this.parsePrompt(prompt);
       return await this.routeTask(task, prompt, context);
     } catch (error) {
       console.error('Error handling prompt:', error);
