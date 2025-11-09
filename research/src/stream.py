@@ -109,7 +109,12 @@ def parse_timestamp_from_filename(filename: str) -> float:
 
 
 @app.get("/stream/audio")
-async def stream_audio():
+async def stream_audio(speed: float = 1.0):
+    """
+    Stream audio segments with timing synchronization and speed control.
+    
+    speed: Playback speed multiplier (1.0 = real-time, 2.0 = 2x speed, etc.)
+    """
     AUDIO_SEGMENTS_DIR = DATA_DIR / "audio_segments"
     
     if not AUDIO_SEGMENTS_DIR.exists():
@@ -136,9 +141,9 @@ async def stream_audio():
         start_time = asyncio.get_event_loop().time()
         
         for i, file_info in enumerate(files_list):
-            # Wait until it's time to load this file
+            # Wait until it's time to load this file (adjusted by speed)
             if i > 0:
-                target_time = file_info['timestamp']
+                target_time = file_info['timestamp'] / speed
                 elapsed = asyncio.get_event_loop().time() - start_time
                 wait_time = target_time - elapsed
                 
