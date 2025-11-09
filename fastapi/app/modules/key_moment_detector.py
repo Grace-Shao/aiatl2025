@@ -87,11 +87,6 @@ class KeyMomentDetector:
         self.segment_count += 1
         self.current_audio_time = timestamp
         
-        # Log every 50 segments to track progress
-        if self.segment_count % 50 == 0:
-            logger.info(f"📈 Added segment #{self.segment_count-1} at {timestamp:.1f}s ({len(audio_data)} bytes)")
-        elif self.segment_count <= 5:  # Log first few for debugging
-            logger.info(f"🎵 Added segment #{self.segment_count-1} at {timestamp:.1f}s ({len(audio_data)} bytes)")
     
     
     def get_audio_score_for_play(self, play_timestamp: float) -> tuple[float, List[int]]:
@@ -168,10 +163,9 @@ class KeyMomentDetector:
         # Calculate play criticality
         play_score, _, _ = calculate_play_criticality_score(normalized_play)
         
-        # DEBUG: If play score is still 0, log more details
         if play_score == 0.0:
             logger.warning(
-                f"Play score still 0! Normalized data: Down={normalized_play.get('Down')}, "
+                f"Play is 0! Normalized data: Down={normalized_play.get('Down')}, "
                 f"Distance={normalized_play.get('Distance')}, Quarter={normalized_play.get('Quarter')}, "
                 f"PlayType='{normalized_play.get('PlayType')}', Description='{normalized_play.get('Description')}'"
             )
@@ -217,7 +211,7 @@ class KeyMomentDetector:
         
         if is_key:
             logger.info(
-                f"🔥 KEY MOMENT at {play_timestamp:.1f}s: "
+                f"KEY MOMENT at {play_timestamp:.1f}s: "
                 f"Combined={combined_score:.1f} (Play={play_score:.1f}, Audio={audio_score:.1f})"
             )
         
@@ -303,17 +297,14 @@ async def process_streams_for_key_moments(
             chunk_size = int.from_bytes(buffer[4:8], 'little')
             total_size = chunk_size + 8
             
-            logger.debug(f"📦 Found WAV file: chunk_size={chunk_size}, total_size={total_size}")
             
             # Check if we have the complete file
             if len(buffer) < total_size:
-                logger.debug(f"⏳ Need more data: have {len(buffer)}, need {total_size}")
                 break
             
             # Extract this WAV file
             wav_data = bytes(buffer[:total_size])
             wav_files.append(wav_data)
-            logger.debug(f"Extracted WAV #{len(wav_files)}: {len(wav_data)} bytes")
             
             # Remove it from buffer
             buffer[:] = buffer[total_size:]
@@ -331,15 +322,6 @@ async def process_streams_for_key_moments(
         
         audio_chunk_count += 1
         
-        # Debug first chunk
-        if audio_chunk_count == 1:
-            logger.info(f"📥 First audio chunk: {len(chunk)} bytes")
-            logger.info(f"   Starts with: {chunk[:min(20, len(chunk))].hex()}")
-            riff_pos = chunk.find(b'RIFF')
-            if riff_pos >= 0:
-                logger.info(f"   RIFF found at position {riff_pos}")
-            else:
-                logger.info(f"   No RIFF in first chunk")
         
         # Add chunk to buffer
         audio_buffer.extend(chunk)
@@ -357,17 +339,7 @@ async def process_streams_for_key_moments(
             
             detector.add_audio_segment(wav_data, estimated_timestamp)
         
-        # Progress logging
-        if audio_chunk_count % 500 == 0:
-            logger.info(
-                f"Audio progress: {audio_chunk_count} chunks, "
-                f"{detector.segment_count} WAV segments extracted, "
-                f"buffer: {len(audio_buffer)} bytes"
-            )
-        
-        # Log WAV extraction progress
-        if len(wav_files) > 0:
-            logger.info(f"🎵 Extracted {len(wav_files)} new WAV file(s)! Total: {detector.segment_count}")
+ 
     
     
     
