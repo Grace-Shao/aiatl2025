@@ -6,13 +6,18 @@ authors = ["Dheeraj Thota <10102005dt@gmail.com>"]
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.15"
 fastapi = "^0.121.1"
 uvicorn = {extras = ["standard"], version = "^0.38.0"}
 python-multipart = "^0.0.20"
 pydantic = "^2.12.4"
 pydantic-settings = "^2.11.0"
 httpx = "^0.28.1"
+transformers = "^4.57.1"
+torchaudio = "^2.9.0"
+librosa = "^0.11.0"
+pandas = "^2.3.3"
+tqdm = "^4.67.1"
 
 
 [build-system]

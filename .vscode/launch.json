@@ -27,7 +27,7 @@
              "cwd": "${workspaceFolder}/research",
             "module": "uvicorn",
             "args": [
-                "app.main:app",
+                "src.stream:app",
                 "--host",
                 "0.0.0.0", 
                 "--port", 

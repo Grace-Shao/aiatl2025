@@ -87,7 +87,7 @@ def process_plays_with_audio_sync(intervals: List[float]):
 
 
 @app.get("/stream/audio")
-async def stream_audio():
+async def stream_audio(speed: float = 1.0):
     if not AUDIO_FILE.exists():
         return Response(content="Audio file not found", status_code=404)
     

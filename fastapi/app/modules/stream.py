@@ -55,20 +55,6 @@ async def listen_to_events_stream(
 ) -> None:
     """
     Listen to the Server-Sent Events (SSE) stream from the streaming API.
-    
-    Args:
-        base_url: Base URL of the streaming API
-        event_callback: Optional callback function to process each event
-        speed: Playback speed multiplier (1.0 = real-time, 2.0 = 2x speed)
-        quarter_intervals: Optional dict with q1_start, q1_end, etc.
-        timeout: Timeout in seconds for the stream connection
-    
-    Example:
-        async def process_event(event: dict):
-            print(f"Play: {event.get('Description')}")
-            print(f"Timestamp: {event.get('absoluteAudioTimestamp')}")
-        
-        await listen_to_events_stream(event_callback=process_event, speed=2.0)
     """
     # Build query parameters
     params = {"speed": speed}
@@ -98,13 +84,21 @@ async def listen_to_events_stream(
                 async for chunk in response.aiter_text():
                     buffer += chunk
                     
-                    # Process complete SSE messages
-                    while "\n\n" in buffer:
-                        message, buffer = buffer.split("\n\n", 1)
+                    # Split on newlines and process each line
+                    lines = buffer.split('\n')
+                    # Keep the last incomplete line in buffer
+                    buffer = lines[-1]
+                    
+                    for line in lines[:-1]:
+                        line = line.strip()
+                        
+                        # Skip empty lines
+                        if not line:
+                            continue
                         
                         # Parse SSE format (data: {...})
-                        if message.startswith("data: "):
-                            data_str = message[6:]  # Remove "data: " prefix
+                        if line.startswith("data: "):
+                            data_str = line[6:]  # Remove "data: " prefix
                             
                             try:
                                 event_data = json.loads(data_str)
@@ -123,6 +117,7 @@ async def listen_to_events_stream(
                                     
                             except json.JSONDecodeError as e:
                                 print(f"Failed to parse event data: {e}")
+                                print(f"Problematic data: {data_str}")
                                 
         except httpx.HTTPError as e:
             print(f"HTTP error occurred: {e}")
@@ -170,8 +165,8 @@ async def example_both_streams():
     """Example: Listen to both audio and events simultaneously."""
     # Run both listeners concurrently
     await asyncio.gather(
-        listen_to_audio_stream(),
-        listen_to_events_stream(speed=1.0)
+        # listen_to_audio_stream(),
+        listen_to_events_stream(speed=100.0)
     )
 
 
