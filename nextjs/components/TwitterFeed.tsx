@@ -160,10 +160,35 @@ export default function TwitterFeed() {
     }));
   }, []);
 
+  // Fetch sample tweets from the new API route
   useEffect(() => {
-      // Fetch existing threads from API and prepend to sample tweets
+    fetch('/api/sample-tweets')
+      .then(r => {
+        if (!r.ok) {
+          throw new Error(`Failed to fetch sample tweets: ${r.statusText}`);
+        }
+        return r.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTweets(data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching sample tweets:', error);
+      });
+  }, []);
+
+  // Fetch existing threads from API and prepend to sample tweets
+  useEffect(() => {
+    // Fetch existing threads from API and prepend to sample tweets
     fetch('/api/forum/threads')
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) {
+          throw new Error(`Failed to fetch threads: ${r.statusText}`);
+        }
+        return r.json();
+      })
       .then(data => {
         if (Array.isArray(data)) {
           const formattedTweets: Tweet[] = data.map(thread => ({
@@ -180,11 +205,13 @@ export default function TwitterFeed() {
             retweets: Math.floor(Math.random() * 20),
             replies: thread.comments?.length || 0,
           }));
-            // Prepend new tweets from API to sample tweets
-            setTweets(prev => [...formattedTweets, ...prev]);
+          // Prepend new tweets from API to sample tweets
+          setTweets(prev => [...formattedTweets, ...prev]);
         }
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error('Error fetching threads:', error);
+      });
   }, []);
 
   // Observe the bottom sentinel for infinite scroll
@@ -206,7 +233,7 @@ export default function TwitterFeed() {
     if (!newTweetText.trim()) return;
 
     const newTweet: Tweet = {
-      id: `t-${Date.now()}`,
+      id: `t-${Date.now()}-${Math.random()}`, // Ensure unique ID
       author: {
         name: "You",
         username: "you",
@@ -236,14 +263,14 @@ export default function TwitterFeed() {
       setTweets([newTweet, ...tweets]);
       setNewTweetText("");
       setIsComposing(false);
-  setSelectedMediaUrl(undefined);
-  setSelectedMediaType(undefined);
+      setSelectedMediaUrl(undefined);
+      setSelectedMediaType(undefined);
 
       // Check if AI agent is tagged
       if (newTweetText.includes('@PrizePicksAI')) {
         setTimeout(() => {
           const aiResponse: Tweet = {
-            id: `ai-${Date.now()}`,
+            id: `ai-${Date.now()}-${Math.random()}`, // Ensure unique ID
             author: {
               name: "PrizePicks AI",
               username: "PrizePicksAI",
