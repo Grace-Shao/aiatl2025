@@ -1,4 +1,6 @@
-import { useKeyMoments, type KeyMoment as APIKeyMoment } from './hooks/useKeyMoments'
+"use client"
+
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 export interface TimelineKeyMoment {
   id: string
@@ -12,138 +14,137 @@ export interface TimelineKeyMoment {
   category?: string
 }
 
-export class KeyMomentsConnector {
-  private onNewMomentCallback?: (moment: TimelineKeyMoment) => void
-  private keyMomentsHook?: ReturnType<typeof useKeyMoments>
-  private currentTime = 0
-
-  constructor() {
-    console.log('🔧 KeyMomentsConnector initialized')
-  }
-
-  /**
-   * Set the callback to be called when new key moments are detected
-   */
-  setOnNewMoment(callback: (moment: TimelineKeyMoment) => void) {
-    this.onNewMomentCallback = callback
-  }
-
-  /**
-   * Update current time (used for positioning moments on timeline)
-   */
-  updateCurrentTime(time: number) {
-    this.currentTime = time
-  }
-
-  /**
-   * Convert API key moment to timeline format
-   */
-  private convertToTimelineFormat(apiMoment: APIKeyMoment): TimelineKeyMoment {
-    // Position moment relative to current time + some spacing
-    const momentTime = this.currentTime + (apiMoment.detected_at * 5)
-    
-    return {
-      id: apiMoment.id,
-      time: momentTime,
-      title: apiMoment.play_category,
-      description: apiMoment.description,
-      videoStart: momentTime - 2,
-      videoEnd: momentTime + 3,
-      addedAt: Date.now(),
-      score: apiMoment.combined_score,
-      category: apiMoment.play_category
-    }
-  }
-
-  /**
-   * Initialize the connector with key moments hook (call this from a React component)
-   */
-  init(keyMomentsHook: ReturnType<typeof useKeyMoments>) {
-    this.keyMomentsHook = keyMomentsHook
-    
-    // Process new key moments as they arrive
-    keyMomentsHook.keyMoments.forEach(apiMoment => {
-      if (this.onNewMomentCallback) {
-        const timelineMoment = this.convertToTimelineFormat(apiMoment)
-        console.log('🎯 New key moment converted for timeline:', timelineMoment.title, 
-          `(Score: ${timelineMoment.score})`)
-        this.onNewMomentCallback(timelineMoment)
-      }
-    })
-  }
-
-  /**
-   * Start listening for key moments
-   */
-  start() {
-    if (this.keyMomentsHook) {
-      console.log('🚀 Starting key moments detection')
-      this.keyMomentsHook.connect()
-    } else {
-      console.warn('⚠️ Key moments hook not initialized')
-    }
-  }
-
-  /**
-   * Stop listening for key moments
-   */
-  stop() {
-    if (this.keyMomentsHook) {
-      console.log('⏹️ Stopping key moments detection')
-      this.keyMomentsHook.disconnect()
-    }
-  }
-
-  /**
-   * Get connection status
-   */
-  get isConnected() {
-    return this.keyMomentsHook?.isConnected || false
-  }
-
-  /**
-   * Get any connection errors
-   */
-  get error() {
-    return this.keyMomentsHook?.error || null
-  }
-
-  /**
-   * Get detection stats
-   */
-  get stats() {
-    return this.keyMomentsHook?.stats || { total_analyzed: 0, total_detected: 0 }
-  }
-
-  /**
-   * Reset the connector
-   */
-  reset() {
-    if (this.keyMomentsHook) {
-      this.keyMomentsHook.reset()
-    }
-  }
+interface KeyMomentData {
+  status?: 'connected' | 'completed' | 'error' | 'heartbeat'
+  message?: string
+  timestamp?: string
+  combined_score?: number
+  play_score?: number
+  audio_score?: number
+  play_category?: string
+  description?: string
+  play_type?: string
+  quarter?: number
+  down?: number
+  distance?: number
+  yard_line?: string
+  detected_at?: number
+  total_moments_analyzed?: number
+  key_moments_detected?: number
 }
 
-// Create a singleton instance
-export const keyMomentsConnector = new KeyMomentsConnector()
-
-// React hook to use the connector in components
 export function useKeyMomentsConnector() {
-  const keyMomentsHook = useKeyMoments({
-    speed: 100.0,
-    audio_weight: 0.3,
-    play_weight: 0.7,
-    key_moment_threshold: 50.0
-  })
+  const [isConnected, setIsConnected] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [keyMoments, setKeyMoments] = useState<TimelineKeyMoment[]>([])
+  const [stats, setStats] = useState({ total_analyzed: 0, total_detected: 0 })
+  const eventSourceRef = useRef<EventSource | null>(null)
+  const currentTimeRef = useRef(0)
 
-  // Initialize the connector with the hook
-  keyMomentsConnector.init(keyMomentsHook)
+  const connect = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close()
+    }
+
+    console.log('🚀 Connecting to key moments API...')
+    setIsConnected(false)
+    setError(null)
+
+    const url = 'http://localhost:3001/getkeymoments?speed=20&audio_weight=0.3&play_weight=0.7&key_moment_threshold=50&context_segments=2'
+    const es = new EventSource(url)
+    
+    es.onopen = () => {
+      console.log('✅ Connected to key moments API')
+      setIsConnected(true)
+      setError(null)
+    }
+
+    es.onmessage = (event) => {
+      try {
+        const data: KeyMomentData = JSON.parse(event.data)
+        
+        if (data.status === 'connected') {
+          console.log(`📡 ${data.message}`)
+        } else if (data.status === 'completed') {
+          console.log(`🏁 ${data.message}`)
+          setStats({
+            total_analyzed: data.total_moments_analyzed || 0,
+            total_detected: data.key_moments_detected || 0
+          })
+        } else if (data.status === 'error') {
+          console.error(`❌ ${data.message}`)
+          setError(data.message || 'Unknown error')
+        } else if (data.timestamp) {
+          // KEY MOMENT DETECTED!
+          console.log(`🎯 KEY MOMENT: ${data.play_category} (Score: ${data.combined_score})`)
+          
+          const momentTime = currentTimeRef.current + (data.detected_at || 0) * 3
+          
+          const newMoment: TimelineKeyMoment = {
+            id: `moment-${data.detected_at}-${Date.now()}`,
+            time: momentTime,
+            title: data.play_category || 'Key Moment',
+            description: data.description || 'No description',
+            videoStart: momentTime - 2,
+            videoEnd: momentTime + 3,
+            addedAt: Date.now(),
+            score: data.combined_score,
+            category: data.play_category
+          }
+          
+          setKeyMoments(prev => [...prev, newMoment])
+        }
+      } catch (err) {
+        console.error('❌ Parse error:', err)
+        setError('Failed to parse stream data')
+      }
+    }
+
+    es.onerror = (error) => {
+      console.error('❌ Stream error:', error)
+      setError('Connection failed')
+      setIsConnected(false)
+      es.close()
+      eventSourceRef.current = null
+    }
+
+    eventSourceRef.current = es
+  }, [])
+
+  const disconnect = useCallback(() => {
+    if (eventSourceRef.current) {
+      console.log('🔌 Disconnecting from key moments API')
+      eventSourceRef.current.close()
+      eventSourceRef.current = null
+    }
+    setIsConnected(false)
+    setIsConnected(false)
+  }, [])
+
+  const reset = useCallback(() => {
+    setKeyMoments([])
+    setError(null)
+    setStats({ total_analyzed: 0, total_detected: 0 })
+  }, [])
+
+  const updateCurrentTime = useCallback((time: number) => {
+    currentTimeRef.current = time
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      disconnect()
+    }
+  }, [disconnect])
 
   return {
-    connector: keyMomentsConnector,
-    isConnected: keyMomentsHook.isConnected,
-    error: keyMomentsHook.error,
-    stats: keyMomentsHook.stats
+    isConnected,
+    error,
+    keyMoments,
+    stats,
+    connect,
+    disconnect,
+    reset,
+    updateCurrentTime
   }
 }

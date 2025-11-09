@@ -78,12 +78,14 @@ export default function Page() {
   return (
     <div className="min-h-screen h-screen overflow-hidden gradient-primary">
       <div className="w-full mx-auto px-6 sm:px-8 pt-8 pb-0">
-        {/* Top bar: HypeX left + Open Video button right */}
+        {/* Top bar: HypeZone logo left + Open Video button right */}
         <div className="mb-3 flex items-center justify-between">
-          <div className="text-left py-1">
-            <h1 className="ml-2 sm:ml-4 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-pink-400 bg-clip-text text-transparent leading-tight pb-2">
-              HypeZone
-            </h1>
+          <div className="text-left py-1 ml-2 sm:ml-4">
+            <img 
+              src="/logo.png" 
+              alt="HypeZone Logo" 
+              className="h-32 sm:h-30 w-auto drop-shadow-lg"
+            />
           </div>
           <div className="flex items-center gap-3">
             <button

@@ -2,7 +2,10 @@
 
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useState, useRef, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { useState, useRef, useEffect, type CSSProperties } from "react"
+import { useKeyMomentsConnector, type TimelineKeyMoment as KeyMoment } from "@/lib/keyMomentsConnector"
+import styles from "./timeline.module.css"
 
 interface TimelineProps {
   currentTime: number
@@ -11,79 +14,70 @@ interface TimelineProps {
   onNewMoment?: (moment: { id: string; time: number; title: string; description: string }) => void
 }
 
-interface KeyMoment {
-  id: string
-  time: number
-  title: string
-  description: string
-  videoStart: number
-  videoEnd: number
-  addedAt?: number
-}
-
-const PREDEFINED_MOMENTS: Omit<KeyMoment, "addedAt">[] = [
-  {
-    id: "moment-0",
-    time: 0,
-    title: "Game Start",
-    description: "The game begins with the opening kickoff!",
-    videoStart: 0,
-    videoEnd: 5,
-  },
-  {
-    id: "moment-3",
-    time: 5,
-    title: "First Pass",
-    description: "Quarterback completes a quick pass to the receiver!",
-    videoStart: 1,
-    videoEnd: 6,
-  },
-  {
-    id: "moment-5",
-    time: 15,
-    title: "Big Play",
-    description: "Amazing run breaks through the defense!",
-    videoStart: 3,
-    videoEnd: 8,
-  },
-]
+const VIEW_PAST_SECONDS = 60
+const VIEW_FUTURE_SECONDS = 20
+const TICK_INTERVAL = 10
+const PIXELS_PER_SECOND = 9
+const TRACK_ANCHOR_PERCENT = 65
 
 export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: TimelineProps) {
   const [selectedMoment, setSelectedMoment] = useState<KeyMoment | null>(null)
   const [visibleMoments, setVisibleMoments] = useState<KeyMoment[]>([])
-  const timelineRef = useRef<HTMLDivElement>(null)
-  const triggeredMomentsRef = useRef<Set<string>>(new Set())
+  const [isDetectionActive, setIsDetectionActive] = useState(false)
+  const processedMomentIdsRef = useRef<Set<string>>(new Set())
 
+  // Use the connector hook
+  const { isConnected, error, stats, keyMoments, connect, disconnect, reset, updateCurrentTime } = useKeyMomentsConnector()
+
+  // Update current time in connector
   useEffect(() => {
-    PREDEFINED_MOMENTS.forEach((moment) => {
-      if (currentTime >= moment.time && !triggeredMomentsRef.current.has(moment.id)) {
-        setVisibleMoments((prev) => {
-          // Check if moment already exists in previous state
-          if (prev.find((m) => m.id === moment.id)) {
-            return prev
-          }
-          
-          console.log("[v0] Adding key moment at", moment.time, "seconds:", moment.title)
-          const newMoment = { ...moment, addedAt: Date.now() }
-          return [...prev, newMoment].sort((a, b) => a.time - b.time)
-        })
-        
-        // Mark as triggered and call callback outside of setState
-        triggeredMomentsRef.current.add(moment.id)
-        if (onNewMoment) {
-          // Use setTimeout to defer the callback to avoid setState during render
-          setTimeout(() => {
-            onNewMoment({
-              id: moment.id,
-              time: moment.time,
-              title: moment.title,
-              description: moment.description,
-            })
-          }, 0)
+    updateCurrentTime(currentTime)
+  }, [currentTime, updateCurrentTime])
+
+  // Sync keyMoments from API to visibleMoments
+  useEffect(() => {
+    keyMoments.forEach((moment: KeyMoment) => {
+      if (processedMomentIdsRef.current.has(moment.id)) {
+        return
+      }
+
+      processedMomentIdsRef.current.add(moment.id)
+
+      setVisibleMoments((prev) => {
+        if (prev.find((m) => m.id === moment.id)) {
+          return prev
         }
+
+        console.log("[Timeline] Adding API key moment:", moment.title)
+
+        return [...prev, moment].sort((a, b) => a.time - b.time)
+      })
+
+      if (onNewMoment) {
+        onNewMoment({
+          id: moment.id,
+          time: moment.time,
+          title: moment.title,
+          description: moment.description,
+        })
       }
     })
-  }, [currentTime, onNewMoment])
+  }, [keyMoments, onNewMoment])
+
+  const handleStartDetection = () => {
+    processedMomentIdsRef.current.clear()
+    setVisibleMoments([])
+    reset()
+    updateCurrentTime(currentTime)
+    connect()
+    setIsDetectionActive(true)
+  }
+
+  const handleStopDetection = () => {
+    setIsDetectionActive(false)
+    disconnect()
+    reset()
+  }
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -91,195 +85,238 @@ export function Timeline({ currentTime, duration, isPlaying, onNewMoment }: Time
     return `${mins}:${secs.toString().padStart(2, "0")}`
   }
 
-  const pixelsPerSecond = 10
-  const playheadPosition = "90%"
+  const latestMoment = visibleMoments.length > 0 ? visibleMoments[visibleMoments.length - 1] : null
 
-  const getMarkerLeftPosition = (momentTime: number) => {
-    const offset = currentTime - momentTime
-    return `calc(90% - ${offset * pixelsPerSecond}px)`
+  let timelineAnchorTime = Math.max(currentTime, latestMoment?.time ?? 0)
+  if (timelineAnchorTime - currentTime > VIEW_PAST_SECONDS - 5) {
+    timelineAnchorTime = currentTime + VIEW_PAST_SECONDS - 5
+  }
+  const viewStartTime = Math.max(0, timelineAnchorTime - VIEW_PAST_SECONDS)
+  const maxVisibleTime = duration > 0 ? duration : timelineAnchorTime + VIEW_FUTURE_SECONDS
+  const viewEndTime = Math.min(maxVisibleTime, timelineAnchorTime + VIEW_FUTURE_SECONDS)
+
+  const clampValue = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+  const clampedCurrentTime = clampValue(currentTime, viewStartTime, viewEndTime)
+
+  const getTrackPosition = (time: number) => {
+    const offset = timelineAnchorTime - time
+    return `calc(${TRACK_ANCHOR_PERCENT}% - ${offset * PIXELS_PER_SECOND}px)`
   }
 
-  const latestMoment = visibleMoments.length > 0 ? visibleMoments[visibleMoments.length - 1] : null
+  const playheadLeft = getTrackPosition(clampedCurrentTime)
+
+  const ticks: number[] = []
+  const firstTick = Math.floor(viewStartTime / TICK_INTERVAL) * TICK_INTERVAL
+  for (let tick = Math.max(0, firstTick); tick <= viewEndTime; tick += TICK_INTERVAL) {
+    ticks.push(tick)
+  }
 
   const isMomentNew = (moment: KeyMoment) => {
     if (!moment.addedAt) return false
     return Date.now() - moment.addedAt < 3000 // 3 seconds
   }
 
+  const statusIndicator = (() => {
+    if (!isDetectionActive) {
+      return { color: "#6b7280", text: "Detection Inactive", animate: false }
+    }
+    if (error) {
+      return { color: "#ef4444", text: "LIVE - Error", animate: true }
+    }
+    if (isConnected) {
+      return { color: "#22c55e", text: "LIVE - Key Moments Active", animate: true }
+    }
+    return { color: "#eab308", text: "LIVE - Connecting...", animate: true }
+  })()
+
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold text-foreground">Live Timeline</h2>
-          <p className="text-sm text-muted-foreground flex items-center gap-2">
-            {isPlaying && (
-              <>
-                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                <span>LIVE</span>
-              </>
-            )}
-            {!isPlaying && "Paused"}
+    <Card className={styles.timelineCard}>
+      <div className={styles.header}>
+        <div className={styles.headerCopy}>
+          <h2 className={styles.heading}>Live Timeline</h2>
+          <p className={styles.statusRow}>
+            <span
+              className={`${styles.statusDot} ${statusIndicator.animate ? styles.statusDotPulse : ""}`}
+              style={{ backgroundColor: statusIndicator.color }}
+            />
+            <span className={styles.statusText}>
+              {statusIndicator.text}
+              {isDetectionActive && !isPlaying ? " (Video Paused)" : ""}
+            </span>
           </p>
+          {error && isDetectionActive && <p className={styles.errorText}>{error}</p>}
         </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold text-primary">{formatTime(currentTime)}</div>
-          <div className="text-xs text-muted-foreground">Current Time</div>
+        <div className={styles.headerActions}>
+          <div className={styles.timeBlock}>
+            <div className={styles.currentTime}>{formatTime(currentTime)}</div>
+            <div className={styles.timeLabel}>Current Time</div>
+          </div>
+          {!isDetectionActive ? (
+            <Button onClick={handleStartDetection} className={styles.startButton}>
+              Start Detection
+            </Button>
+          ) : (
+            <Button onClick={handleStopDetection} variant="destructive">
+              Stop Detection
+            </Button>
+          )}
         </div>
       </div>
 
-      <div className="relative mb-6">
-        <div className="overflow-hidden relative h-24 bg-secondary/20 rounded-lg border border-border">
-          <div ref={timelineRef} className="absolute inset-0">
-            {/* Timeline line */}
-            <div
-              className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-purple-500/30 to-pink-500/30"
-              style={{ transform: "translateY(-50%)" }}
-            />
+      <div className={styles.timelineOuter}>
+        <div className={styles.trackSurface}>
+          <div className={styles.trackCanvas}>
+            <div className={styles.trackGlow} />
+            <div className={styles.trackBaseline} />
 
-            {/* Tick marks every 10 seconds - scroll from right to left */}
-            {Array.from({ length: Math.ceil(currentTime / 10) + 5 }).map((_, i) => {
-              const time = i * 10
-              const offset = currentTime - time
-              const leftPosition = `calc(90% - ${offset * pixelsPerSecond}px)`
-
-              // Only show if within visible range
-              if (offset > currentTime + 50 || offset < -100) return null
+            {ticks.map((time) => {
+              const leftPosition = getTrackPosition(time)
 
               return (
-                <div
-                  key={`tick-${i}`}
-                  className="absolute top-1/2 transform -translate-y-1/2 transition-all duration-200"
-                  style={{ left: leftPosition }}
-                >
-                  <div className="w-px h-4 bg-muted-foreground/30" />
-                  <div className="text-xs text-muted-foreground/50 mt-1 transform -translate-x-1/2 whitespace-nowrap">
-                    {formatTime(time)}
-                  </div>
+                <div key={`tick-${time}`} className={styles.tick} style={{ left: leftPosition }}>
+                  <div className={styles.tickLine} />
+                  <div className={styles.tickLabel}>{formatTime(time)}</div>
                 </div>
               )
             })}
 
-            {/* Key moment teardrops - appear when timestamp is crossed */}
             {visibleMoments
               .filter((moment, index, self) => self.findIndex((m) => m.id === moment.id) === index)
               .map((moment) => {
-                const offset = currentTime - moment.time
+                if (moment.time < viewStartTime || moment.time > viewEndTime) {
+                  return null
+                }
 
-                // Only show if within reasonable range
-                if (offset < -5 || offset > 100) return null
-
+                const leftPosition = getTrackPosition(moment.time)
                 const isLatest = latestMoment?.id === moment.id
                 const isNew = isMomentNew(moment)
                 const showAnimation = isLatest && isNew
+                const rawScore = moment.score ?? 60
+                const normalizedScore = Math.min(Math.max(rawScore / 100, 0.15), 1)
+                const starSize = 26 + normalizedScore * 18
+                const starLift = 28 + normalizedScore * 10
+                const starOpacity = 0.15 + normalizedScore * 0.65
 
                 return (
-                  <button
-                    key={moment.id}
-                  onClick={() => setSelectedMoment(moment)}
-                  className="absolute top-2 transform -translate-x-1/2 cursor-pointer group z-10 transition-all duration-200"
-                  style={{ left: getMarkerLeftPosition(moment.time) }}
-                >
-                  {showAnimation && (
-                    <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap animate-pulse">
-                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                        Latest key moment
+                  <div key={moment.id} className={styles.momentMarker} style={{ left: leftPosition }}>
+                    {showAnimation && (
+                      <div className={styles.latestBadge}>Latest key moment</div>
+                    )}
+                    <button
+                      onClick={() => setSelectedMoment(moment)}
+                      className={styles.starButton}
+                      style={{
+                        "--star-size": `${starSize}px`,
+                        "--star-lift": `${starLift}px`,
+                      } as CSSProperties}
+                    >
+                      <div className={styles.starIconWrap}>
+                        <div className={styles.starGlow} style={{ opacity: showAnimation ? 0.9 : starOpacity }} />
+                        <svg
+                          viewBox="0 0 64 64"
+                          className={`${styles.starIcon} ${showAnimation ? styles.starIconPulse : ""}`}
+                        >
+                          <defs>
+                            <linearGradient id={`star-gradient-${moment.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#fde68a" />
+                              <stop offset="50%" stopColor="#fbbf24" />
+                              <stop offset="100%" stopColor="#fb923c" />
+                            </linearGradient>
+                          </defs>
+                          <path
+                            d="M32 4l7.9 15.9 17.6 2.6-12.7 12.4 3 17.5L32 44.8 16.2 52.4l3-17.5L6.5 22.5l17.6-2.6L32 4z"
+                            fill={`url(#star-gradient-${moment.id})`}
+                            stroke="rgba(255,255,255,0.45)"
+                            strokeWidth={2.2}
+                          />
+                        </svg>
                       </div>
-                      {/* Arrow pointing down */}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                        <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-pink-500" />
-                      </div>
-                    </div>
-                  )}
-
-                  {showAnimation && (
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full border-4 border-red-500/60 animate-ping-upward" />
-                      </div>
-                    </div>
-                  )}
-
-                  <svg
-                    width={showAnimation ? "32" : "24"}
-                    height={showAnimation ? "42" : "32"}
-                    viewBox="0 0 24 32"
-                    fill="none"
-                    className={`drop-shadow-lg transition-all duration-500 ${
-                      showAnimation ? "animate-[bounce_1s_ease-in-out_3]" : ""
-                    } group-hover:scale-125 group-hover:-translate-y-1`}
-                    style={{
-                      filter: showAnimation ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))" : undefined,
-                    }}
-                  >
-                    <path
-                      d="M12 0C12 0 0 12 0 20C0 26.6274 5.37258 32 12 32C18.6274 32 24 26.6274 24 20C24 12 12 0 12 0Z"
-                      fill="#EF4444"
-                    />
-                    <circle cx="12" cy="20" r="4" fill="white" fillOpacity="0.4" />
-                  </svg>
-                  {/* Tooltip */}
-                  <div className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
-                    <div className="bg-black/90 text-white text-xs px-2 py-1 rounded shadow-lg">{moment.title}</div>
+                      <span className={styles.starLabel}>{moment.title}</span>
+                    </button>
                   </div>
-                </button>
-              )
-            })}
+                )
+              })}
 
-            <div
-              className="absolute top-0 bottom-0 w-0.5 bg-primary shadow-lg shadow-primary/50 z-20"
-              style={{ left: playheadPosition }}
-            >
-              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                <div className="w-3 h-3 bg-primary rounded-full shadow-lg shadow-primary/50 animate-pulse" />
-              </div>
-              <div className="absolute top-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                <div className="text-sm font-bold text-primary">{formatTime(currentTime)}</div>
-              </div>
+            <div className={styles.playhead} style={{ left: playheadLeft }}>
+              <div className={styles.playheadNeedle} />
+              <div className={styles.playheadCap} />
+              <div className={styles.playheadLabel}>{formatTime(currentTime)}</div>
             </div>
           </div>
 
-          {/* Right edge overlay to show space for future moments */}
-          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-secondary/40 to-transparent pointer-events-none" />
+          <div className={styles.fadeLeft} />
+          <div className={styles.fadeRight} />
+
+          {visibleMoments.length === 0 && isDetectionActive && !error && (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyTextBlock}>
+                <div className={styles.emptyText}>
+                  {isConnected ? "Analyzing gameplay..." : "Connecting to key moment detector..."}
+                </div>
+                <div className={styles.emptySubtext}>
+                  {isConnected ? "Moments will illuminate the track" : "Waiting for server stream..."}
+                </div>
+              </div>
+            </div>
+          )}
+          {visibleMoments.length === 0 && isDetectionActive && error && (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyError}>
+                <div className={styles.emptyText}>Unable to stream key moments</div>
+                <div className={styles.emptySubtext}>{error}</div>
+              </div>
+            </div>
+          )}
+          {visibleMoments.length === 0 && !isDetectionActive && (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyTextBlock}>
+                <div className={styles.emptyText}>Click "Start Detection" to begin</div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 text-center">
-        <div className="p-3 rounded-lg bg-secondary/30">
-          <div className="text-lg font-bold text-foreground">{visibleMoments.length}</div>
-          <div className="text-xs text-muted-foreground mt-1">Key Moments</div>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{visibleMoments.length}</div>
+          <div className={styles.statLabel}>Key Moments</div>
+          {stats.total_detected > 0 && (
+            <div className={styles.statHint}>{stats.total_detected} from API</div>
+          )}
         </div>
-        <div className="p-3 rounded-lg bg-secondary/30">
-          <div className="text-lg font-bold text-foreground">{Math.floor((currentTime / duration) * 100) || 0}%</div>
-          <div className="text-xs text-muted-foreground mt-1">Complete</div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{Math.floor((currentTime / duration) * 100) || 0}%</div>
+          <div className={styles.statLabel}>Complete</div>
         </div>
-        <div className="p-3 rounded-lg bg-secondary/30">
-          <div className="text-lg font-bold text-foreground">{formatTime(Math.max(0, duration - currentTime))}</div>
-          <div className="text-xs text-muted-foreground mt-1">Remaining</div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{formatTime(Math.max(0, duration - currentTime))}</div>
+          <div className={styles.statLabel}>Remaining</div>
         </div>
       </div>
 
       {/* Highlight Dialog */}
       <Dialog open={selectedMoment !== null} onOpenChange={(open) => !open && setSelectedMoment(null)}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className={styles.dialogContent}>
           <DialogHeader>
-            <DialogTitle className="text-2xl bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <DialogTitle className={styles.dialogTitle}>
               {selectedMoment?.title}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="text-sm text-muted-foreground">
+          <div className={styles.dialogBody}>
+            <div className={styles.dialogText}>
               Time:{" "}
-              <span className="text-primary font-semibold">{selectedMoment && formatTime(selectedMoment.time)}</span>
+              <span className={styles.dialogHighlight}>{selectedMoment && formatTime(selectedMoment.time)}</span>
             </div>
-            <p className="text-foreground">{selectedMoment?.description}</p>
-            <div className="bg-secondary/30 rounded-lg p-4 text-center">
-              <p className="text-sm text-muted-foreground mb-2">5-Second Highlight Clip</p>
-              <p className="text-xs text-muted-foreground">
+            <p className={styles.dialogDescription}>{selectedMoment?.description}</p>
+            <div className={styles.dialogHighlightBox}>
+              <p className={styles.dialogHighlightLabel}>5-Second Highlight Clip</p>
+              <p className={styles.dialogHighlightRange}>
                 {selectedMoment && `${formatTime(selectedMoment.videoStart)} - ${formatTime(selectedMoment.videoEnd)}`}
               </p>
-              <div className="mt-4 aspect-video bg-black/50 rounded flex items-center justify-center">
-                <p className="text-muted-foreground text-sm">Video clip preview will play here</p>
+              <div className={styles.dialogPreview}>
+                <p className={styles.dialogPreviewText}>Video clip preview will play here</p>
               </div>
             </div>
           </div>
