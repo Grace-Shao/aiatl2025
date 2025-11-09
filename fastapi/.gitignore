@@ -1,0 +1,7 @@
+# Ignore the config folder
+config/*
+poetry.lock
+.env
+
+# Ignore all __pycache__ directories
+**/__pycache__/
