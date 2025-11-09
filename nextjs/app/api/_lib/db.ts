@@ -21,6 +21,8 @@ type Thread = {
   votes: number;
   createdAt: number;
   comments: Comment[];
+  mediaUrl?: string;
+  mediaType?: 'image' | 'gif' | 'video';
 };
 
 let client: MongoClient | null = null;

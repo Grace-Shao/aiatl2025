@@ -16,7 +16,7 @@ const sampleTweets = [
     likes: 42,
     retweets: 15,
     replies: 8,
-    mediaUrl: "https://example.com/sample-gif.gif",
+    mediaUrl: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDU2cHdyN3c0M2MwbGlkZjB5ZG90NzZlN3MxNHViZjBoMXJycGJxayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif",
     mediaType: 'gif',
   },
   {
@@ -32,7 +32,7 @@ const sampleTweets = [
     likes: 128,
     retweets: 34,
     replies: 12,
-    mediaUrl: "https://example.com/sample-meme.jpg",
+    mediaUrl: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDU2cHdyN3c0M2MwbGlkZjB5ZG90NzZlN3MxNHViZjBoMXJycGJxayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif",
     mediaType: 'image',
   },
   {

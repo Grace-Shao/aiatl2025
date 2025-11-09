@@ -32,62 +32,15 @@ interface Tweet {
 }
 
 export default function TwitterFeed() {
-  // Initialize with empty timestamps to avoid hydration mismatch
-  const [tweets, setTweets] = useState<Tweet[]>([
-    // Initial sample tweets with GIFs and memes
-    {
-      id: "sample-1",
-      author: {
-        name: "PrizePicks AI",
-        username: "PrizePicksAI",
-        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=PrizePicksAI`,
-        verified: true,
-      },
-      content: "🏈 GAME TIME! Ravens vs Chiefs about to be WILD! Drop your hot takes below 👇",
-      timestamp: "",
-      likes: 42,
-      retweets: 15,
-      replies: 8,
-      mediaUrl: sampleGifs[0],
-      mediaType: 'gif',
-    },
-    {
-      id: "sample-2",
-      author: {
-        name: "NFL Fan",
-        username: "nflfan2025",
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=nflfan`,
-        verified: false,
-      },
-      content: "When you see Derrick Henry break through the defense 💀",
-      timestamp: "",
-      likes: 128,
-      retweets: 34,
-      replies: 12,
-      mediaUrl: sampleMemes[0],
-      mediaType: 'image',
-    },
-    {
-      id: "sample-3",
-      author: {
-        name: "Sports Bettor",
-        username: "sportsbetking",
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=betking`,
-        verified: false,
-      },
-      content: "@PrizePicksAI What are Lamar Jackson's chances for 300+ yards tonight?",
-      timestamp: "",
-      likes: 23,
-      retweets: 5,
-      replies: 3,
-    },
-  ]);
+  // Initialize with empty array to avoid hydration mismatch - will load from API
+  const [tweets, setTweets] = useState<Tweet[]>([]);
   const [newTweetText, setNewTweetText] = useState("");
   const [isComposing, setIsComposing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [selectedMediaUrl, setSelectedMediaUrl] = useState<string | undefined>(undefined);
   const [selectedMediaType, setSelectedMediaType] = useState<'image' | 'gif' | 'video' | undefined>(undefined);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [showMentionSuggestion, setShowMentionSuggestion] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -126,7 +79,7 @@ export default function TwitterFeed() {
   };
 
   const loadMore = () => {
-    if (isLoadingMore) return;
+    if (isLoadingMore || !initialLoadComplete) return;
     setIsLoadingMore(true);
     // Simulate network latency
     setTimeout(() => {
@@ -158,26 +111,15 @@ export default function TwitterFeed() {
   useEffect(() => {
     setIsMounted(true);
 
-    // Set timestamps for sample tweets
-    setTweets(prev => prev.map((tweet, index) => {
-      if (tweet.timestamp === "" && tweet.id.startsWith("sample-")) {
-        const hoursAgo = index === 0 ? 1 : index === 1 ? 2 : 3;
-        return {
-          ...tweet,
-          timestamp: new Date(Date.now() - hoursAgo * 3600000).toISOString()
-        };
-      }
-      return tweet;
-    }));
-  }, []);
-
-  useEffect(() => {
-      // Fetch existing threads from API and prepend to sample tweets
-    fetch('/api/forum/threads')
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const formattedTweets: Tweet[] = data.map(thread => ({
+    // Fetch both sample tweets and forum threads
+    Promise.all([
+      fetch('/api/sample-tweets').then(r => r.json()),
+      fetch('/api/forum/threads').then(r => r.json())
+    ]).then(([sampleData, forumData]) => {
+      const sampleTweets = Array.isArray(sampleData) ? sampleData : [];
+      
+      const forumTweets: Tweet[] = Array.isArray(forumData) 
+        ? forumData.map(thread => ({
             id: thread.id,
             author: {
               name: thread.author,
@@ -186,16 +128,19 @@ export default function TwitterFeed() {
               verified: thread.author.includes('Bot')
             },
             content: thread.excerpt || thread.title,
-            timestamp: thread.timestamp, // Store raw timestamp, format in render
+            timestamp: thread.timestamp,
             likes: thread.votes || 0,
             retweets: Math.floor(Math.random() * 20),
             replies: thread.comments?.length || 0,
-          }));
-            // Prepend new tweets from API to sample tweets
-            setTweets(prev => [...formattedTweets, ...prev]);
-        }
-      })
-      .catch(console.error);
+            mediaUrl: thread.mediaUrl,
+            mediaType: thread.mediaType,
+          }))
+        : [];
+
+      // Forum tweets first, then sample tweets
+      setTweets([...forumTweets, ...sampleTweets]);
+      setInitialLoadComplete(true);
+    }).catch(console.error);
   }, []);
 
   // Observe the bottom sentinel for infinite scroll
@@ -286,6 +231,8 @@ export default function TwitterFeed() {
           title: newTweetText.substring(0, 100),
           content: newTweetText,
           author: 'You',
+          mediaUrl: selectedMediaUrl,
+          mediaType: selectedMediaType,
         }),
       });
 
@@ -586,7 +533,7 @@ export default function TwitterFeed() {
                     <>
                       <span className="text-gray-400">{tweet.repostMeta?.by} reposted</span>
                       <span className="text-gray-500">·</span>
-                      <span className="text-gray-500">{isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ''}</span>
+                      <span className="text-gray-500" suppressHydrationWarning>{isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ''}</span>
                     </>
                   ) : (
                     <>
@@ -598,7 +545,7 @@ export default function TwitterFeed() {
                       )}
                       <span className="text-gray-500">@{tweet.author.username}</span>
                       <span className="text-gray-500">·</span>
-                      <span className="text-gray-500">
+                      <span className="text-gray-500" suppressHydrationWarning>
                         {isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ''}
                       </span>
                     </>
@@ -633,7 +580,7 @@ export default function TwitterFeed() {
                           )}
                           <span className="text-gray-500">@{original.author.username}</span>
                           <span className="text-gray-500">·</span>
-                          <span className="text-gray-500">{isMounted && original.timestamp ? formatTimestamp(original.timestamp) : ''}</span>
+                          <span className="text-gray-500" suppressHydrationWarning>{isMounted && original.timestamp ? formatTimestamp(original.timestamp) : ''}</span>
                         </div>
                         <p className="mt-1 whitespace-pre-wrap break-words">
                           {renderContentWithMentions(original.content)}
@@ -737,7 +684,7 @@ export default function TwitterFeed() {
                               <span className="font-bold hover:underline">{r.author.name}</span>
                               <span className="text-gray-500">@{r.author.username}</span>
                               <span className="text-gray-500">·</span>
-                              <span className="text-gray-500">{isMounted && r.timestamp ? formatTimestamp(r.timestamp) : ''}</span>
+                              <span className="text-gray-500" suppressHydrationWarning>{isMounted && r.timestamp ? formatTimestamp(r.timestamp) : ''}</span>
                             </div>
                             <p className="mt-1 whitespace-pre-wrap break-words">
                               {renderContentWithMentions(r.content)}
