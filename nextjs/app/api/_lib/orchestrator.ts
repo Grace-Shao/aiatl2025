@@ -10,6 +10,7 @@ export class Orchestrator {
       factChecker: new FactCheckingAgent(),
       opinionGenerator: new OpinionAgent(),
       gameStatistics: new GameStatisticsAgent(),
+      emailSender: new EmailSenderAgent(),
     };
   }
 
@@ -447,6 +448,105 @@ ${isLiveGame ? '- Remember: only reference data from quarters that have been pla
     } catch (error) {
       console.error('Error analyzing game statistics:', error);
       return `Unable to retrieve game statistics at this time: ${error}`;
+    }
+  }
+}
+
+class EmailSenderAgent {
+  async handlePrompt(prompt: string): Promise<string> {
+    const result = await this.sendGameEmail(prompt);
+    return result;
+  }
+
+  private async sendGameEmail(prompt: string): Promise<string> {
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not set');
+    }
+
+    try {
+      // Fetch game data for context
+      const gameDataRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/game-data`);
+      const gameData = await gameDataRes.json();
+
+      console.log('Generating email content with game data:', gameData);
+
+      // Use Gemini to compose an engaging email about the game
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { 
+                    text: `You are composing an exciting email to friends about a live sports game. Use the following game data:
+
+Request: ${prompt}
+
+Game Data: ${JSON.stringify(gameData, null, 2)}
+
+Generate an email with:
+1. Subject line (exciting and attention-grabbing)
+2. Email body (engaging, 3-4 paragraphs highlighting key stats, player performances, and exciting moments)
+
+Format as JSON:
+{
+  "subject": "your subject here",
+  "body": "your email body here"
+}
+
+Make it enthusiastic and packed with the actual stats from the data!` 
+                  }
+                ]
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Gemini API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const emailContent = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+      if (!emailContent) {
+        throw new Error('No email content response from Gemini');
+      }
+
+      // Parse the JSON response
+      const jsonMatch = emailContent.match(/\{[\s\S]*\}/);
+      let emailData;
+      if (jsonMatch) {
+        emailData = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('Failed to parse email content');
+      }
+
+      // Send the email using the API
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'Alex, Ryan, Maya', // Default to first friend group
+          subject: emailData.subject,
+          message: emailData.body,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      return `📧 Email sent successfully!\n\nSubject: ${emailData.subject}\n\nPreview: ${emailData.body.substring(0, 100)}...`;
+    } catch (error) {
+      console.error('Error sending game email:', error);
+      return `Unable to send email at this time: ${error}`;
     }
   }
 }

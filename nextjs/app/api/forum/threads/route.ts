@@ -8,7 +8,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  // expected: { id?, title, author, excerpt, content, votes }
+  // expected: { id?, title, author, excerpt, content, votes, mediaUrl?, mediaType? }
   const thread = await addThread({
     id: body.id ?? `t-${Date.now()}`,
     title: body.title ?? 'Untitled',
@@ -16,6 +16,8 @@ export async function POST(req: Request) {
     excerpt: body.content?.substring(0, 100) ?? body.excerpt ?? '',
     timestamp: new Date().toISOString(),
     votes: body.votes ?? 0,
+    mediaUrl: body.mediaUrl,
+    mediaType: body.mediaType,
   });
 
   return NextResponse.json(thread, { status: 201 });
