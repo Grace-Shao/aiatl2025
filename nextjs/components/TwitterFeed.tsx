@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react";
-import { Heart, MessageCircle, Repeat2, Bookmark, Share, MoreHorizontal, Image as ImageIcon, Smile, CalendarDays } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Bookmark, MoreHorizontal, Image as ImageIcon, Smile, CalendarDays } from "lucide-react";
 import { sampleGifs, sampleMemes, funnyTweetTemplates } from "@/lib/social-content";
 
 interface Tweet {
@@ -26,6 +26,9 @@ interface Tweet {
   isRepost?: boolean;
   repostOfId?: string; // id of the original tweet
   repostMeta?: { by: string; username: string; avatar: string };
+  // Replies
+  isReply?: boolean;
+  replyToId?: string;
 }
 
 export default function TwitterFeed() {
@@ -86,6 +89,8 @@ export default function TwitterFeed() {
   const [selectedMediaType, setSelectedMediaType] = useState<'image' | 'gif' | 'video' | undefined>(undefined);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [openReply, setOpenReply] = useState<Record<string, boolean>>({});
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
 
   // Helper to generate more tweets (older ones) for infinite scroll simulation
   const generateMoreTweets = (count = 6): Tweet[] => {
@@ -269,7 +274,7 @@ export default function TwitterFeed() {
   };
 
   const handleLike = (tweetId: string) => {
-    setTweets(tweets.map(tweet => 
+    setTweets(tweets.map((tweet: Tweet) => 
       tweet.id === tweetId 
         ? { ...tweet, isLiked: !tweet.isLiked, likes: tweet.isLiked ? tweet.likes - 1 : tweet.likes + 1 }
         : tweet
@@ -335,11 +340,55 @@ export default function TwitterFeed() {
   };
 
   const handleBookmark = (tweetId: string) => {
-    setTweets(tweets.map(tweet => 
+    setTweets(tweets.map((tweet: Tweet) => 
       tweet.id === tweetId 
         ? { ...tweet, isBookmarked: !tweet.isBookmarked }
         : tweet
     ));
+  };
+
+  const toggleReply = (tweetId: string) => {
+    setOpenReply((prev: Record<string, boolean>) => ({ ...prev, [tweetId]: !prev[tweetId] }));
+  };
+
+  const handleReplyChange = (tweetId: string, text: string) => {
+    setReplyDrafts((prev: Record<string, string>) => ({ ...prev, [tweetId]: text }));
+  };
+
+  const handleReplySubmit = (tweetId: string) => {
+    const text = (replyDrafts[tweetId] || '').trim();
+    if (!text) return;
+    setTweets(prev => {
+      const idx = prev.findIndex(t => t.id === tweetId);
+      if (idx === -1) return prev;
+      const parent = prev[idx];
+
+      const reply: Tweet = {
+        id: `reply-${Date.now()}-${tweetId}`,
+        author: { name: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=you' },
+        content: text,
+        timestamp: 'Just now',
+        likes: 0,
+        retweets: 0,
+        replies: 0,
+        isReply: true,
+        replyToId: tweetId,
+      };
+
+      // Determine insertion point: after parent and any existing replies to this parent
+      let insertAt = idx + 1;
+      while (insertAt < prev.length && prev[insertAt].isReply && prev[insertAt].replyToId === tweetId) {
+        insertAt++;
+      }
+
+      const updated = [...prev];
+      updated.splice(insertAt, 0, reply);
+      // bump parent reply count
+      updated[idx] = { ...parent, replies: (parent.replies || 0) + 1 };
+      return updated;
+    });
+    setReplyDrafts((prev: Record<string, string>) => ({ ...prev, [tweetId]: '' }));
+    setOpenReply((prev: Record<string, boolean>) => ({ ...prev, [tweetId]: false }));
   };
 
   return (
@@ -415,7 +464,7 @@ export default function TwitterFeed() {
 
       {/* Feed */}
       <div className="divide-y divide-gray-800">
-        {tweets.map((tweet) => (
+        {tweets.filter(t => !t.isReply).map((tweet) => (
           <div key={tweet.id} className="p-4 hover:bg-gray-900/50 transition cursor-pointer">
             <div className="flex gap-3">
               {/* Avatar */}
@@ -495,7 +544,7 @@ export default function TwitterFeed() {
 
                 {/* Actions */}
                 <div className="mt-3 flex items-center justify-between max-w-md">
-                  <button aria-label={`Reply to @${tweet.author.username}`} className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
+                  <button onClick={() => toggleReply(tweet.id)} aria-label={`Reply to @${tweet.author.username}`} className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
                     <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition">
                       <MessageCircle className="w-5 h-5" />
                     </div>
@@ -533,13 +582,64 @@ export default function TwitterFeed() {
                       <Bookmark className={`w-5 h-5 ${tweet.isBookmarked ? 'fill-current' : ''}`} />
                     </div>
                   </button>
-
-                    <button aria-label="Share tweet" className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
-                    <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition">
-                      <Share className="w-5 h-5" />
-                    </div>
-                  </button>
                 </div>
+
+                {/* Reply composer */}
+                {openReply[tweet.id] && (
+                  <div className="mt-3 pl-12">
+                    <div className="flex gap-3 items-start">
+                      <img 
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=you" 
+                        alt="Your avatar" 
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <div className="flex-1">
+                        <textarea
+                          value={replyDrafts[tweet.id] || ''}
+                          onChange={(e) => handleReplyChange(tweet.id, e.target.value)}
+                          placeholder="Post your reply"
+                          className="w-full bg-transparent text-base outline-none resize-none placeholder-gray-600 border border-gray-800 rounded-lg p-2"
+                          rows={3}
+                        />
+                        <div className="mt-2 flex justify-end">
+                          <button
+                            onClick={() => handleReplySubmit(tweet.id)}
+                            disabled={!((replyDrafts[tweet.id] || '').trim())}
+                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white font-bold py-1.5 px-4 rounded-full transition"
+                          >
+                            Reply
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Replies list (nested) */}
+                {tweets.some(t => t.isReply && t.replyToId === tweet.id) && (
+                  <div className="mt-3 space-y-3">
+                    {tweets.filter(t => t.isReply && t.replyToId === tweet.id).map(r => (
+                      <div key={r.id} className="pl-12">
+                        <div className="flex gap-3">
+                          <img 
+                            src={r.author.avatar}
+                            alt={r.author.name}
+                            className="w-10 h-10 rounded-full flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold hover:underline">{r.author.name}</span>
+                              <span className="text-gray-500">@{r.author.username}</span>
+                              <span className="text-gray-500">·</span>
+                              <span className="text-gray-500">{isMounted && r.timestamp ? formatTimestamp(r.timestamp) : ''}</span>
+                            </div>
+                            <p className="mt-1 whitespace-pre-wrap break-words">{r.content}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
