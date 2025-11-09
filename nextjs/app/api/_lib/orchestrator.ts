@@ -126,7 +126,7 @@ class MemeGeneratorAgent {
     return meme;
   }
 
-  private async generateMeme(prompt: string): Promise<{ text?: string; imagePath?: string; imageUrl?: string }> {
+  private async generateMeme(prompt: string): Promise<{ text?: string; imageUrl?: string }> {
     if (!GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY is not set');
     }
@@ -169,7 +169,7 @@ class MemeGeneratorAgent {
       const data = await response.json();
       console.log('Gemini response:', JSON.stringify(data, null, 2));
 
-      const result: { text?: string; imagePath?: string; imageUrl?: string } = {};
+      const result: { text?: string; imageUrl?: string } = {};
 
       // Process all parts in the response
       const parts = data.candidates?.[0]?.content?.parts;
@@ -202,7 +202,6 @@ class MemeGeneratorAgent {
           const buffer = Buffer.from(imageData, 'base64');
           fs.writeFileSync(filepath, buffer);
 
-          result.imagePath = filepath;
           result.imageUrl = `/generated-memes/${filename}`;
           console.log('Image saved to:', filepath);
           console.log('Image URL:', result.imageUrl);

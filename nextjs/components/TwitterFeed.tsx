@@ -263,7 +263,7 @@ export default function TwitterFeed() {
           
           try {
             const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-            aiContent = parsed.text || parsed || 'Check out this response! 🔥';
+            aiContent = parsed.text || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed)) || 'Check out this response! 🔥';
             aiMediaUrl = parsed.imageUrl;
           } catch {
             aiContent = typeof raw === 'string' ? raw : JSON.stringify(raw);
@@ -290,8 +290,8 @@ export default function TwitterFeed() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              title: aiContent.substring(0, 100),
-              content: aiContent,
+              title: String(aiContent).substring(0, 100),
+              content: String(aiContent),
               author: 'PrizePicks AI',
               mediaUrl: aiMediaUrl,
               mediaType: aiMediaUrl ? (aiMediaUrl.includes('.gif') ? 'gif' : 'image') : undefined,
