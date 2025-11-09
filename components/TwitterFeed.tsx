@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Heart, MessageCircle, Repeat2, Bookmark, Share, MoreHorizontal, Image as ImageIcon, Smile, CalendarDays } from "lucide-react";
 import { sampleGifs, sampleMemes, funnyTweetTemplates } from "@/lib/social-content";
 
@@ -78,6 +78,51 @@ export default function TwitterFeed() {
   const [newTweetText, setNewTweetText] = useState("");
   const [isComposing, setIsComposing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [selectedMediaUrl, setSelectedMediaUrl] = useState<string | undefined>(undefined);
+  const [selectedMediaType, setSelectedMediaType] = useState<'image' | 'gif' | 'video' | undefined>(undefined);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  // Helper to generate more tweets (older ones) for infinite scroll simulation
+  const generateMoreTweets = (count = 6): Tweet[] => {
+    const now = Date.now();
+    const arr: Tweet[] = [];
+    for (let i = 0; i < count; i++) {
+      const useGif = Math.random() > 0.5;
+      const mediaPool = useGif ? sampleGifs : sampleMemes;
+      const media = mediaPool[Math.floor(Math.random() * mediaPool.length)];
+      const template = funnyTweetTemplates[Math.floor(Math.random() * funnyTweetTemplates.length)] || "What a game!";
+      const hoursAgo = 4 + i + Math.floor(Math.random() * 12); // make them older than samples
+      const seed = `user-${Math.floor(Math.random() * 10000)}`;
+      arr.push({
+        id: `old-${now}-${i}`,
+        author: {
+          name: `Fan ${seed}`,
+          username: seed,
+          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`,
+          verified: false,
+        },
+        content: template,
+        timestamp: new Date(now - hoursAgo * 3600000).toISOString(),
+        likes: Math.floor(Math.random() * 200),
+        retweets: Math.floor(Math.random() * 60),
+        replies: Math.floor(Math.random() * 40),
+        mediaUrl: media,
+        mediaType: useGif ? 'gif' : 'image',
+      });
+    }
+    return arr;
+  };
+
+  const loadMore = () => {
+    if (isLoadingMore) return;
+    setIsLoadingMore(true);
+    // Simulate network latency
+    setTimeout(() => {
+      setTweets(prev => [...prev, ...generateMoreTweets()]);
+      setIsLoadingMore(false);
+    }, 800);
+  };
 
   // Helper function to format timestamp as relative time
   const formatTimestamp = (timestamp: string | Date): string => {
@@ -142,6 +187,21 @@ export default function TwitterFeed() {
       .catch(console.error);
   }, []);
 
+  // Observe the bottom sentinel for infinite scroll
+  useEffect(() => {
+    if (!bottomRef.current) return;
+    const el = bottomRef.current;
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        loadMore();
+      }
+    }, { root: null, rootMargin: '200px', threshold: 0 });
+
+    observer.observe(el);
+    return () => observer.unobserve(el);
+  }, [bottomRef.current, isLoadingMore]);
+
   const handlePostTweet = async () => {
     if (!newTweetText.trim()) return;
 
@@ -157,6 +217,8 @@ export default function TwitterFeed() {
       likes: 0,
       retweets: 0,
       replies: 0,
+      mediaUrl: selectedMediaUrl,
+      mediaType: selectedMediaType,
     };
 
     // Post to backend
@@ -174,6 +236,8 @@ export default function TwitterFeed() {
       setTweets([newTweet, ...tweets]);
       setNewTweetText("");
       setIsComposing(false);
+  setSelectedMediaUrl(undefined);
+  setSelectedMediaType(undefined);
 
       // Check if AI agent is tagged
       if (newTweetText.includes('@PrizePicksAI')) {
@@ -225,7 +289,7 @@ export default function TwitterFeed() {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div className="text-white">
       {/* Compose Tweet Box */}
       <div className="border-b border-gray-800 p-4">
         <div className="flex gap-3">
@@ -243,16 +307,41 @@ export default function TwitterFeed() {
               className="w-full bg-transparent text-xl outline-none resize-none placeholder-gray-600"
               rows={isComposing ? 3 : 1}
             />
+            {/* Quick preview of attached media */}
+            {selectedMediaUrl && (
+              <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
+                <img src={selectedMediaUrl} alt="Selected media" className="w-full" />
+              </div>
+            )}
             
             {isComposing && (
               <div className="mt-3 flex items-center justify-between">
                 <div className="flex gap-1">
-                    <button aria-label="Add image" className="p-2 hover:bg-blue-500/10 rounded-full transition">
-                    <ImageIcon className="w-5 h-5 text-blue-500" />
-                  </button>
-                    <button aria-label="Add emoji" className="p-2 hover:bg-blue-500/10 rounded-full transition">
-                    <Smile className="w-5 h-5 text-blue-500" />
-                  </button>
+                    <button
+                      aria-label="Add image or GIF"
+                      onClick={() => {
+                        // Randomly attach a meme or GIF
+                        const pickGif = Math.random() > 0.5
+                        const pool = pickGif ? sampleGifs : sampleMemes
+                        const choice = pool[Math.floor(Math.random() * pool.length)]
+                        setSelectedMediaUrl(choice)
+                        setSelectedMediaType(pickGif ? 'gif' : 'image')
+                      }}
+                      className="p-2 hover:bg-blue-500/10 rounded-full transition"
+                    >
+                      <ImageIcon className="w-5 h-5 text-blue-500" />
+                    </button>
+                    <button
+                      aria-label="Add emoji"
+                      onClick={() => {
+                        const emojis = ['🔥','😂','🏈','🤖','👏','💪','😮','🎯','🏆','✨']
+                        const e = emojis[Math.floor(Math.random() * emojis.length)]
+                        setNewTweetText((t) => (t ? t + ' ' + e : e))
+                      }}
+                      className="p-2 hover:bg-blue-500/10 rounded-full transition"
+                    >
+                      <Smile className="w-5 h-5 text-blue-500" />
+                    </button>
                     <button aria-label="Schedule tweet" className="p-2 hover:bg-blue-500/10 rounded-full transition">
                     <CalendarDays className="w-5 h-5 text-blue-500" />
                   </button>
@@ -311,7 +400,7 @@ export default function TwitterFeed() {
 
                 {/* Actions */}
                 <div className="mt-3 flex items-center justify-between max-w-md">
-                  <button className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
+                  <button aria-label={`Reply to @${tweet.author.username}`} className="flex items-center gap-2 text-gray-500 hover:text-blue-500 group">
                     <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition">
                       <MessageCircle className="w-5 h-5" />
                     </div>
@@ -319,6 +408,7 @@ export default function TwitterFeed() {
                   </button>
 
                   <button 
+                    aria-label={tweet.isRetweeted ? 'Undo retweet' : 'Retweet'}
                     onClick={() => handleRetweet(tweet.id)}
                     className={`flex items-center gap-2 group ${tweet.isRetweeted ? 'text-green-500' : 'text-gray-500 hover:text-green-500'}`}
                   >
@@ -329,6 +419,7 @@ export default function TwitterFeed() {
                   </button>
 
                   <button 
+                    aria-label={tweet.isLiked ? 'Unlike' : 'Like'}
                     onClick={() => handleLike(tweet.id)}
                     className={`flex items-center gap-2 group ${tweet.isLiked ? 'text-pink-500' : 'text-gray-500 hover:text-pink-500'}`}
                   >
@@ -339,6 +430,7 @@ export default function TwitterFeed() {
                   </button>
 
                   <button 
+                    aria-label={tweet.isBookmarked ? 'Remove bookmark' : 'Bookmark'}
                     onClick={() => handleBookmark(tweet.id)}
                     className={`flex items-center gap-2 group ${tweet.isBookmarked ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'}`}
                   >
@@ -357,6 +449,11 @@ export default function TwitterFeed() {
             </div>
           </div>
         ))}
+        {/* Loading indicator & sentinel */}
+        <div className="p-4 text-center text-gray-500">
+          {isLoadingMore ? 'Loading more…' : 'Scroll to load more'}
+        </div>
+        <div ref={bottomRef} className="h-2" />
       </div>
     </div>
   );

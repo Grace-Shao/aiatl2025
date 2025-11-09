@@ -74,42 +74,38 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen gradient-primary">
-      <div className="w-full max-w-7xl mx-auto px-4 py-8">
-        <Link
-          href="/choose-game"
-          className="inline-flex items-center text-gray-300 hover:text-white transition-colors mb-6"
-        >
-          <span className="mr-2">←</span> Back to Game Selection
-        </Link>
-
-        {/* Header */}
-        <header className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-balance bg-gradient-to-r from-purple-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
-            PrizePicks Live Track
-          </h1>
-          <p className="text-muted-foreground mt-2">Your second screen sports companion</p>
-        </header>
-
-        <div className="mb-6 flex justify-center">
-          <div className="flex flex-col items-center">
+    <div className="min-h-screen h-screen overflow-hidden gradient-primary">
+      <div className="w-full mx-auto px-6 sm:px-8 pt-6 pb-0">
+        {/* Top bar: HypeX left + Open Video button right */}
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-left">
+            <h1 className="ml-2 sm:ml-4 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
+              HypeX
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
             <button
               onClick={openVideoWindow}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all hover:scale-105"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-3 py-2 rounded-md font-medium flex items-center gap-2 transition-all"
+              aria-label="Open video on second screen"
             >
-              <Monitor className="h-5 w-5" />
-              Open Video on Second Screen
-              <ExternalLink className="h-4 w-4" />
+              <Monitor className="h-4 w-4" />
+              <span className="hidden sm:inline">Open Video</span>
+              <ExternalLink className="h-3 w-3" />
             </button>
-            {videoWindow && !videoWindow.closed && (
-              <p className="text-sm text-gray-300 mt-2">✓ Video player is open on second screen</p>
-            )}
           </div>
         </div>
+        {/* Removed back link and centered title as requested */}
 
-        {/* Timeline Section */}
-        <div className="w-full mb-8 flex justify-center">
-          <div className="w-full max-w-6xl space-y-4">
+  {/* Side-by-side layout: left timeline + right social feed; extra top margin */}
+  <div className="w-full flex flex-col lg:flex-row items-start gap-6 mt-4 h-[calc(100vh-150px)]">
+          {/* Left column: tracker + timeline (auto height, not stretched) */}
+          <div className="w-full lg:w-1/2 lg:shrink-0 space-y-4 px-2 lg:px-4 lg:self-center overflow-hidden">
+            {/* Section title + tagline above timeline */}
+            <div className="pl-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Live Hype Feed & Timeline</h2>
+              <p className="mt-1 text-base sm:text-lg text-gray-300/90">Real-time sports hype engine — moments, stats, and memes in one stream.</p>
+            </div>
             {/* Game Event Tracker - Shows recent events and auto-posts to forum */}
             <GameEventTracker 
               currentTime={currentTime} 
@@ -118,7 +114,6 @@ export default function Page() {
                 console.log('[Main] Event triggered:', event);
               }}
             />
-            
             {/* Timeline Component */}
             <Timeline
               currentTime={currentTime}
@@ -127,11 +122,9 @@ export default function Page() {
               onNewMoment={setCurrentKeyMoment}
             />
           </div>
-        </div>
-        
-        {/* Twitter-Style Social Media Feed - Full Width */}
-        <div className="w-full">
-          <div className="max-w-2xl mx-auto border-x border-gray-800">
+
+          {/* Right column: Twitter-style feed fills page height with scrollbar */}
+          <div className="w-full lg:w-1/2 min-w-0 px-2 lg:px-4 h-full overflow-y-auto">
             <TwitterFeed />
           </div>
         </div>
