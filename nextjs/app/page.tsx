@@ -10,19 +10,19 @@ export default function Home() {
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background with sports action image effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-purple-950/40 to-black">
-          <div className="absolute inset-0 bg-[url('/intense-sports-action-crowd-celebrating.jpg')] bg-cover bg-center opacity-30 mix-blend-luminosity" />
+          <div className="absolute inset-0 bg-[url('/stadium.jpg')] bg-cover bg-center opacity-30 mix-blend-luminosity" />
         </div>
 
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tighter">
-            <span className="block text-white">HYPE</span>
-            <span className="block bg-gradient-to-r from-purple-400 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+          <h1 className="flex items-center justify-center gap-4 text-9xl md:text-9xl font-black mb-6 tracking-tighter">
+            <span className="text-white">HYPE</span>
+            <span className="bg-gradient-to-r from-purple-400 via-purple-600 to-pink-600 text-transparent bg-clip-text">
               ZONE
             </span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto font-light">
+          <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto font-light">
             Your ultimate second screen companion. Never miss a key moment. Feel every play.
           </p>
 
@@ -101,7 +101,9 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center relative">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 blur-3xl" />
           <div className="relative bg-gradient-to-br from-purple-950/80 to-black border border-purple-700/50 rounded-3xl p-12 md:p-16">
-            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">READY TO ELEVATE YOUR GAME?</h2>
+            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+              READY TO ELEVATE YOUR GAME?
+            </h2>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
               Join thousands of fans experiencing sports like never before
             </p>
