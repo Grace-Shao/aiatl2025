@@ -251,6 +251,7 @@ async def process_streams_for_key_moments(
     play_weight: float = 0.7,
     key_moment_threshold: float = 50.0,
     context_segments: int = 2,
+    key_moment_callback=None,  # NEW: Callback for real-time key moments
     **kwargs  # Ignore unused params like audio_segments_dir
 ) -> List[KeyMoment]:
     """
@@ -384,6 +385,10 @@ async def process_streams_for_key_moments(
                 f"🔥 KEY MOMENT #{play_count} at {moment.timestamp:.1f}s: "
                 f"Score={moment.combined_score:.1f} ({moment.play_category})"
             )
+            
+            # Call the real-time callback if provided
+            if key_moment_callback:
+                key_moment_callback(moment)
         
         if play_count % 25 == 0:
             key_count = sum(1 for m in detector.detected_moments if m.is_key_moment)

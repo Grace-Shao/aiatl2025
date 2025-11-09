@@ -55,83 +55,77 @@ def score_play(play: Play):
 
 @app.get("/getkeymoments")
 async def get_key_moments_realtime(
-    speed: float = 50.0,
-    audio_weight: float = 0.2,
-    play_weight: float = 0.8,
-    key_moment_threshold: float = 45.0,
-    context_segments: int = 3
+    speed: float = 100.0,
+    audio_weight: float = 0.3,
+    play_weight: float = 0.7,
+    key_moment_threshold: float = 50.0,
+    context_segments: int = 2
 ):
     """
-    Stream key moments in real-time as they are detected from synchronized audio and event streams.
-    
-    Returns Server-Sent Events (SSE) with key moments as soon as they're detected.
+    Stream key moments in real-time as they are detected.
     """
-    async def generate_key_moments():
-        # Import here to avoid circular imports
-        from app.modules.key_moment_detector import KeyMomentDetector
-        from app.modules.stream import listen_to_audio_stream, listen_to_events_stream
+    async def stream_key_moments():
+        import asyncio
+        import queue
         
-        detector = KeyMomentDetector(
-            play_weight=play_weight,
-            audio_weight=audio_weight,
-            key_moment_threshold=key_moment_threshold,
-            context_segments=context_segments
+        # Create a queue to receive real-time key moments
+        moment_queue = asyncio.Queue()
+        
+        def key_moment_callback(moment):
+            """Called immediately when a key moment is detected"""
+            asyncio.create_task(moment_queue.put(moment))
+        
+        yield f"data: {json.dumps({'status': 'connected', 'message': 'Starting key moment detection...'})}\n\n"
+        
+        # Start the detection process with real-time callback
+        detection_task = asyncio.create_task(
+            process_streams_for_key_moments(
+                speed=speed,
+                audio_weight=audio_weight,
+                play_weight=play_weight,
+                key_moment_threshold=key_moment_threshold,
+                context_segments=context_segments,
+                key_moment_callback=key_moment_callback
+            )
         )
         
-        # Track progress
-        audio_chunk_count = 0
-        audio_buffer = bytearray()
-        stream_start_time = None
+        key_moment_count = 0
         
-        def extract_wav_files(buffer: bytearray) -> list[bytes]:
-            """Extract complete WAV files from buffer."""
-            wav_files = []
+        try:
+            while not detection_task.done():
+                try:
+                    # Wait for either a key moment or timeout
+                    moment = await asyncio.wait_for(moment_queue.get(), timeout=1.0)
+                    
+                    # Stream this key moment immediately!
+                    key_moment_count += 1
+                    moment_data = {
+                        'timestamp': moment.timestamp,
+                        'combined_score': round(moment.combined_score, 2),
+                        'play_score': round(moment.play_score, 2),
+                        'audio_score': round(moment.audio_score, 2),
+                        'play_category': moment.play_category,
+                        'description': moment.play_data.get('Description', 'N/A'),
+                        'play_type': moment.play_data.get('Type', 'N/A'),
+                        'quarter': moment.play_data.get('quarter'),
+                        'down': moment.play_data.get('Down'),
+                        'distance': moment.play_data.get('Distance'),
+                        'yard_line': moment.play_data.get('YardLine'),
+                        'detected_at': key_moment_count
+                    }
+                    yield f"data: {json.dumps(moment_data)}\n\n"
+                    
+                except asyncio.TimeoutError:
+                    # No key moment in the last second, continue waiting
+                    pass
             
-            while True:
-                riff_idx = buffer.find(b'RIFF')
-                if riff_idx == -1:
-                    break
-                
-                if riff_idx > 0:
-                    buffer[:] = buffer[riff_idx:]
-                
-                if len(buffer) < 8:
-                    break
-                
-                chunk_size = int.from_bytes(buffer[4:8], 'little')
-                total_size = chunk_size + 8
-                
-                if len(buffer) < total_size:
-                    break
-                
-                wav_data = bytes(buffer[:total_size])
-                wav_files.append(wav_data)
-                buffer[:] = buffer[total_size:]
+            # Process completed - get final results
+            all_moments = await detection_task
             
-            return wav_files
-        
-        def process_audio_chunk(chunk: bytes):
-            nonlocal audio_chunk_count, audio_buffer, stream_start_time
-            
-            if stream_start_time is None:
-                import time
-                stream_start_time = time.time()
-            
-            audio_chunk_count += 1
-            audio_buffer.extend(chunk)
-            
-            # Extract WAV files and add to detector
-            wav_files = extract_wav_files(audio_buffer)
-            for wav_data in wav_files:
-                estimated_timestamp = detector.segment_count * 1.0
-                detector.add_audio_segment(wav_data, estimated_timestamp)
-        
-        async def process_event(event: dict):
-            # Process play event and check if it's a key moment
-            moment = detector.process_play_event(event)
-            
-            if moment.is_key_moment:
-                # Stream this key moment immediately!
+            # Send any remaining key moments that might have been missed
+            while not moment_queue.empty():
+                moment = await moment_queue.get()
+                key_moment_count += 1
                 moment_data = {
                     'timestamp': moment.timestamp,
                     'combined_score': round(moment.combined_score, 2),
@@ -144,31 +138,16 @@ async def get_key_moments_realtime(
                     'down': moment.play_data.get('Down'),
                     'distance': moment.play_data.get('Distance'),
                     'yard_line': moment.play_data.get('YardLine'),
-                    'detected_at': len(detector.detected_moments)
+                    'detected_at': key_moment_count
                 }
-                
-                # Yield as Server-Sent Event
                 yield f"data: {json.dumps(moment_data)}\n\n"
             
-            detector.detected_moments.append(moment)
-        
-        # Send initial connection message
-        yield f"data: {json.dumps({'status': 'connected', 'message': 'Starting key moment detection...'})}\n\n"
-        
-        try:
-            # Process both streams concurrently
-            await asyncio.gather(
-                listen_to_audio_stream(chunk_callback=process_audio_chunk, speed=speed),
-                listen_to_events_stream(event_callback=process_event, speed=speed)
-            )
-            
             # Send completion message
-            total_key_moments = sum(1 for m in detector.detected_moments if m.is_key_moment)
             completion_data = {
                 'status': 'completed',
-                'total_moments_analyzed': len(detector.detected_moments),
-                'key_moments_detected': total_key_moments,
-                'message': f'Analysis complete! Detected {total_key_moments} key moments.'
+                'total_moments_analyzed': len(all_moments),
+                'key_moments_detected': key_moment_count,
+                'message': f'Analysis complete! Streamed {key_moment_count} key moments in real-time.'
             }
             yield f"data: {json.dumps(completion_data)}\n\n"
             
@@ -177,7 +156,7 @@ async def get_key_moments_realtime(
             yield f"data: {json.dumps(error_data)}\n\n"
     
     return StreamingResponse(
-        generate_key_moments(),
+        stream_key_moments(),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
