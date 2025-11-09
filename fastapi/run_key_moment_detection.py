@@ -52,7 +52,7 @@ async def main():
     with open('key_moments_detected.json', 'w') as f:
         json.dump(summary, f, indent=2)
     
-    print(f"\n✅ Exported {len(summary)} key moments to 'key_moments_detected.json'")
+    print(f"\nExported {len(summary)} key moments to 'key_moments_detected.json'")
 
 
 if __name__ == "__main__":

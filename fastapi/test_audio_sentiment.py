@@ -69,7 +69,7 @@ async def test_audio_sentiment():
                 # Test the sentiment analysis
                 result = score_clip(wav_data)
                 
-                print(f"✅ Sentiment Analysis Results:")
+                print(f"Sentiment Analysis Results:")
                 print(f"   Happy: {result.get('happy', 0.0):.3f}")
                 print(f"   Angry: {result.get('angry', 0.0):.3f}")
                 print(f"   Neutral: {result.get('neutral', 0.0):.3f}")
@@ -84,7 +84,7 @@ async def test_audio_sentiment():
                 print(f"   Final Score: {final_score:.2f}")
                 
             except Exception as e:
-                print(f"❌ Error analyzing WAV #{tested_count}: {e}")
+                print(f"Error analyzing WAV #{tested_count}: {e}")
                 import traceback
                 traceback.print_exc()
     

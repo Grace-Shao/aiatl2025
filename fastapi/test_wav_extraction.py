@@ -27,7 +27,7 @@ def extract_wav_files(buffer: bytearray) -> list[bytes]:
         
         # Remove any garbage before RIFF
         if riff_idx > 0:
-            print(f"⚠️  Skipping {riff_idx} bytes of garbage before RIFF")
+            print(f"Skipping {riff_idx} bytes of garbage before RIFF")
             buffer[:] = buffer[riff_idx:]
         
         # Need at least 8 bytes to read header
@@ -48,7 +48,7 @@ def extract_wav_files(buffer: bytearray) -> list[bytes]:
         # Extract this WAV file
         wav_data = bytes(buffer[:total_size])
         wav_files.append(wav_data)
-        print(f"✅ Extracted WAV #{len(wav_files)}: {len(wav_data)} bytes")
+        print(f"Extracted WAV #{len(wav_files)}: {len(wav_data)} bytes")
         
         # Remove it from buffer
         buffer[:] = buffer[total_size:]
@@ -77,9 +77,9 @@ async def test_extraction():
             print(f"   Starts with: {chunk[:min(20, len(chunk))].hex()}")
             riff_pos = chunk.find(b'RIFF')
             if riff_pos >= 0:
-                print(f"   🎯 RIFF found at position {riff_pos}")
+                print(f"   RIFF found at position {riff_pos}")
             else:
-                print(f"   ❌ No RIFF in first chunk")
+                print(f"   No RIFF in first chunk")
         
         # Add to buffer
         audio_buffer.extend(chunk)
@@ -102,10 +102,10 @@ async def test_extraction():
             speed=100.0,  # Fast speed for testing
             timeout=300.0  # Longer timeout to handle full stream
         )
-        print(f"\n🏁 Stream completed naturally!")
+        print(f"\nStream completed naturally!")
         
     except Exception as e:
-        print(f"\n❌ Stream error: {e}")
+        print(f"\nStream error: {e}")
         if "connection" in str(e).lower() or "failed" in str(e).lower():
             print("💡 Make sure the streaming server is running:")
             print("   cd research && python -m uvicorn src.stream:app --host 0.0.0.0 --port 8000")
@@ -117,9 +117,9 @@ async def test_extraction():
     print(f"  Remaining buffer: {len(audio_buffer)} bytes")
     
     if wav_count > 0:
-        print("🎉 WAV extraction completed successfully!")
+        print("WAV extraction completed successfully!")
     else:
-        print("⚠️  No WAV files extracted - check server connection")
+        print("No WAV files extracted - check server connection")
     print("="*60)
 
 

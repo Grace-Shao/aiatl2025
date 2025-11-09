@@ -292,7 +292,7 @@ async def process_streams_for_key_moments(
             
             # Remove any garbage before RIFF
             if riff_idx > 0:
-                logger.debug(f"⚠️  Skipping {riff_idx} bytes of garbage before RIFF")
+                logger.debug(f"Skipping {riff_idx} bytes of garbage before RIFF")
                 buffer[:] = buffer[riff_idx:]
             
             # Need at least 8 bytes to read header
@@ -313,7 +313,7 @@ async def process_streams_for_key_moments(
             # Extract this WAV file
             wav_data = bytes(buffer[:total_size])
             wav_files.append(wav_data)
-            logger.debug(f"✅ Extracted WAV #{len(wav_files)}: {len(wav_data)} bytes")
+            logger.debug(f"Extracted WAV #{len(wav_files)}: {len(wav_data)} bytes")
             
             # Remove it from buffer
             buffer[:] = buffer[total_size:]
@@ -337,9 +337,9 @@ async def process_streams_for_key_moments(
             logger.info(f"   Starts with: {chunk[:min(20, len(chunk))].hex()}")
             riff_pos = chunk.find(b'RIFF')
             if riff_pos >= 0:
-                logger.info(f"   🎯 RIFF found at position {riff_pos}")
+                logger.info(f"   RIFF found at position {riff_pos}")
             else:
-                logger.info(f"   ❌ No RIFF in first chunk")
+                logger.info(f"   No RIFF in first chunk")
         
         # Add chunk to buffer
         audio_buffer.extend(chunk)
@@ -360,7 +360,7 @@ async def process_streams_for_key_moments(
         # Progress logging
         if audio_chunk_count % 500 == 0:
             logger.info(
-                f"📊 Audio progress: {audio_chunk_count} chunks, "
+                f"Audio progress: {audio_chunk_count} chunks, "
                 f"{detector.segment_count} WAV segments extracted, "
                 f"buffer: {len(audio_buffer)} bytes"
             )
@@ -382,7 +382,7 @@ async def process_streams_for_key_moments(
         # Log key moments immediately
         if moment.is_key_moment:
             logger.info(
-                f"🔥 KEY MOMENT #{play_count} at {moment.timestamp:.1f}s: "
+                f"KEY MOMENT #{play_count} at {moment.timestamp:.1f}s: "
                 f"Score={moment.combined_score:.1f} ({moment.play_category})"
             )
             
@@ -393,7 +393,7 @@ async def process_streams_for_key_moments(
         if play_count % 25 == 0:
             key_count = sum(1 for m in detector.detected_moments if m.is_key_moment)
             logger.info(
-                f"📊 Event progress: {play_count} plays processed, "
+                f"Event progress: {play_count} plays processed, "
                 f"{key_count} key moments detected, "
                 f"{detector.segment_count} audio segments available"
             )
@@ -405,6 +405,6 @@ async def process_streams_for_key_moments(
     )
     
     key_count = sum(1 for m in detector.detected_moments if m.is_key_moment)
-    logger.info(f"✅ Finished! {play_count} plays, {key_count} key moments detected")
+    logger.info(f"Finished! {play_count} plays, {key_count} key moments detected")
     
     return detector.detected_moments
