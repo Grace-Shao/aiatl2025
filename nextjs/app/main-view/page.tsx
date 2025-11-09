@@ -147,8 +147,29 @@ export default function Page() {
             console.log("[v0] Make post for moment:", currentKeyMoment)
             setCurrentKeyMoment(null)
           }}
-          onSendToGC={() => {
+          onSendToGC={async () => {
             console.log("[v0] Send to GC for moment:", currentKeyMoment)
+            try {
+              const response = await fetch('/api/send-email', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ moment: currentKeyMoment }),
+              })
+
+              if (!response.ok) {
+                const error = await response.json()
+                console.error("[v0] Failed to send email:", error)
+                alert('Failed to send email. Please try again.')
+              } else {
+                const data = await response.json()
+                console.log("[v0] Email sent successfully:", data)
+              }
+            } catch (error) {
+              console.error("[v0] Error sending email:", error)
+              alert('An error occurred while sending the email. Please try again.')
+            }
             setCurrentKeyMoment(null)
           }}
         />
