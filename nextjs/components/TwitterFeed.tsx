@@ -88,6 +88,8 @@ export default function TwitterFeed() {
   const [selectedMediaUrl, setSelectedMediaUrl] = useState<string | undefined>(undefined);
   const [selectedMediaType, setSelectedMediaType] = useState<'image' | 'gif' | 'video' | undefined>(undefined);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showMentionSuggestion, setShowMentionSuggestion] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const [openReply, setOpenReply] = useState<Record<string, boolean>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
@@ -211,6 +213,51 @@ export default function TwitterFeed() {
     return () => observer.unobserve(el);
   }, [bottomRef.current, isLoadingMore]);
 
+  // Handle text change and detect @ mentions
+  const handleTextChange = (text: string) => {
+    setNewTweetText(text);
+    
+    // Check if user just typed @ followed by nothing or partial text
+    const words = text.split(/\s/);
+    const lastWord = words[words.length - 1];
+    
+    if (lastWord.startsWith('@') && lastWord.length >= 1) {
+      const query = lastWord.slice(1).toLowerCase();
+      // Show suggestion if it matches "prizepicks" or "p"
+      if ('prizepicksai'.startsWith(query)) {
+        setShowMentionSuggestion(true);
+      } else {
+        setShowMentionSuggestion(false);
+      }
+    } else {
+      setShowMentionSuggestion(false);
+    }
+  };
+
+  // Insert @PrizePicksAI mention
+  const insertMention = () => {
+    const words = newTweetText.split(/\s/);
+    words[words.length - 1] = '@PrizePicksAI';
+    setNewTweetText(words.join(' ') + ' ');
+    setShowMentionSuggestion(false);
+    textareaRef.current?.focus();
+  };
+
+  // Highlight @mentions in displayed text
+  const renderContentWithMentions = (content: string) => {
+    const parts = content.split(/(@\w+)/g);
+    return parts.map((part, idx) => {
+      if (part.startsWith('@')) {
+        return (
+          <span key={idx} className="text-blue-500 font-medium">
+            {part}
+          </span>
+        );
+      }
+      return <span key={idx}>{part}</span>;
+    });
+  };
+
   const handlePostTweet = async () => {
     if (!newTweetText.trim()) return;
 
@@ -264,15 +311,15 @@ export default function TwitterFeed() {
           const raw = json?.result ?? json?.error ?? 'No response from agent';
           
           // Parse the result to extract text and imageUrl
-          let content = '';
-          let mediaUrl: string | undefined = undefined;
+          let aiContent = '';
+          let aiMediaUrl: string | undefined = undefined;
           
           try {
             const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-            content = parsed.text || 'Check out this meme! 🔥';
-            mediaUrl = parsed.imageUrl;
+            aiContent = parsed.text || parsed || 'Check out this response! 🔥';
+            aiMediaUrl = parsed.imageUrl;
           } catch {
-            content = typeof raw === 'string' ? raw : JSON.stringify(raw);
+            aiContent = typeof raw === 'string' ? raw : JSON.stringify(raw);
           }
 
           const aiResponse: Tweet = {
@@ -283,8 +330,8 @@ export default function TwitterFeed() {
               avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AI",
               verified: true,
             },
-            content,
-            mediaUrl,
+            content: aiContent,
+            mediaUrl: aiMediaUrl,
             timestamp: "Just now",
             likes: 0,
             retweets: 0,
@@ -429,15 +476,42 @@ export default function TwitterFeed() {
             alt="Your avatar" 
             className="w-12 h-12 rounded-full"
           />
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <textarea
+              ref={textareaRef}
               value={newTweetText}
-              onChange={(e) => setNewTweetText(e.target.value)}
+              onChange={(e) => handleTextChange(e.target.value)}
               onFocus={() => setIsComposing(true)}
               placeholder="What's happening?! Tag @PrizePicksAI for insights..."
               className="w-full bg-transparent text-xl outline-none resize-none placeholder-gray-600"
               rows={isComposing ? 3 : 1}
             />
+            
+            {/* Autocomplete suggestion */}
+            {showMentionSuggestion && (
+              <div className="absolute top-full left-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-10 w-64">
+                <button
+                  onClick={insertMention}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-left"
+                >
+                  <img 
+                    src="https://api.dicebear.com/7.x/bottts/svg?seed=AI" 
+                    alt="PrizePicksAI" 
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div>
+                    <div className="text-white font-medium flex items-center gap-1">
+                      PrizePicks AI
+                      <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/>
+                      </svg>
+                    </div>
+                    <div className="text-gray-400 text-sm">@PrizePicksAI</div>
+                  </div>
+                </button>
+              </div>
+            )}
+            
             {/* Quick preview of attached media */}
             {selectedMediaUrl && (
               <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
@@ -534,7 +608,9 @@ export default function TwitterFeed() {
                 {/* Content area */}
                 {!tweet.isRepost ? (
                   <>
-                    <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
+                    <p className="mt-1 whitespace-pre-wrap break-words">
+                      {renderContentWithMentions(tweet.content)}
+                    </p>
                     {tweet.mediaUrl && (
                       <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
                         <img src={tweet.mediaUrl} alt="Tweet media" className="w-full" />
@@ -559,7 +635,9 @@ export default function TwitterFeed() {
                           <span className="text-gray-500">·</span>
                           <span className="text-gray-500">{isMounted && original.timestamp ? formatTimestamp(original.timestamp) : ''}</span>
                         </div>
-                        <p className="mt-1 whitespace-pre-wrap break-words">{original.content}</p>
+                        <p className="mt-1 whitespace-pre-wrap break-words">
+                          {renderContentWithMentions(original.content)}
+                        </p>
                         {original.mediaUrl && (
                           <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
                             <img src={original.mediaUrl} alt="Tweet media" className="w-full" />
@@ -661,7 +739,9 @@ export default function TwitterFeed() {
                               <span className="text-gray-500">·</span>
                               <span className="text-gray-500">{isMounted && r.timestamp ? formatTimestamp(r.timestamp) : ''}</span>
                             </div>
-                            <p className="mt-1 whitespace-pre-wrap break-words">{r.content}</p>
+                            <p className="mt-1 whitespace-pre-wrap break-words">
+                              {renderContentWithMentions(r.content)}
+                            </p>
                           </div>
                         </div>
                       </div>
