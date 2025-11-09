@@ -47,3 +47,33 @@ def score_play(play: Play):
         play=play,
         scoring_breakdown=breakdown
     )
+
+
+@app.post("/key-moments")
+def get_key_moments(plays: list[Play]):
+    """
+    Given a list of plays, return the key moments based on criticality scores.
+    """
+    key_moments = []
+    for play in plays:
+        score, play_category, _ = calculate_play_criticality_score(play)
+        category = categorize_criticality(score)
+        if is_key_play(score, category):
+            key_moments.append({
+                "play": play,
+                "score": score,
+                "category": category,
+                "play_category": play_category
+            })
+    
+    return {"key_moments": key_moments}
+
+
+
+@app.get("/start-stream-listeners")
+def start_stream_listeners():
+    import asyncio
+    from app.modules.stream import example_both_streams
+    asyncio.create_task(example_both_streams())
+
+

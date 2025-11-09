@@ -138,17 +138,21 @@ async def stream_audio(speed: float = 1.0):
         return Response(content="No audio files found in segments directory", status_code=404)
     
     async def iterfile():
-        start_time = asyncio.get_event_loop().time()
+        if not files_list:
+            return
         
-        for i, file_info in enumerate(files_list):
-            # Wait until it's time to load this file (adjusted by speed)
-            if i > 0:
-                target_time = file_info['timestamp'] / speed
-                elapsed = asyncio.get_event_loop().time() - start_time
-                wait_time = target_time - elapsed
-                
-                if wait_time > 0:
-                    await asyncio.sleep(wait_time)
+        # Start timing from when the generator starts
+        start_time = asyncio.get_event_loop().time()
+        first_timestamp = files_list[0]['timestamp']
+        
+        for file_info in files_list:
+            # Calculate target time relative to start (adjusted by speed)
+            target_time = (file_info['timestamp'] - first_timestamp) / speed
+            elapsed = asyncio.get_event_loop().time() - start_time
+            wait_time = target_time - elapsed
+            
+            if wait_time > 0:
+                await asyncio.sleep(wait_time)
             
             # Stream the audio file
             with open(file_info['path'], mode="rb") as file_like:
