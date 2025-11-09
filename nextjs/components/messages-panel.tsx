@@ -1,6 +1,7 @@
 "use client"
 
-import { X, User, MessageSquarePlus } from "lucide-react"
+import { useState } from "react"
+import { X, User, MessageSquarePlus, Mail, Send } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
@@ -56,6 +57,54 @@ interface MessagesPanelProps {
 }
 
 export function MessagesPanel({ isOpen, onClose }: MessagesPanelProps) {
+  const [emailModalOpen, setEmailModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<string>("")
+  const [emailSubject, setEmailSubject] = useState("")
+  const [emailMessage, setEmailMessage] = useState("")
+  const [isSending, setIsSending] = useState(false)
+  const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">("idle")
+
+  const handleSendEmail = async () => {
+    if (!selectedUser || !emailSubject || !emailMessage) return
+
+    setIsSending(true)
+    setSendStatus("idle")
+
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: selectedUser,
+          subject: emailSubject,
+          message: emailMessage,
+        }),
+      })
+
+      if (response.ok) {
+        setSendStatus("success")
+        setTimeout(() => {
+          setEmailModalOpen(false)
+          setEmailSubject("")
+          setEmailMessage("")
+          setSendStatus("idle")
+        }, 2000)
+      } else {
+        setSendStatus("error")
+      }
+    } catch (error) {
+      console.error("Failed to send email:", error)
+      setSendStatus("error")
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const openEmailModal = (userName: string) => {
+    setSelectedUser(userName)
+    setEmailModalOpen(true)
+  }
+
   return (
     <>
       {/* Backdrop */}
@@ -113,10 +162,93 @@ export function MessagesPanel({ isOpen, onClose }: MessagesPanelProps) {
                   {message.preview}
                 </p>
               </div>
+              {/* Email Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  openEmailModal(message.name)
+                }}
+                className="text-purple-400 hover:text-purple-300 hover:bg-gray-800"
+                aria-label="Send email"
+              >
+                <Mail className="h-5 w-5" />
+              </Button>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Email Modal */}
+      {emailModalOpen && (
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-lg border border-gray-700 w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white">Send Email to {selectedUser}</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setEmailModalOpen(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Subject</label>
+                <input
+                  type="text"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="Enter email subject..."
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Message</label>
+                <textarea
+                  value={emailMessage}
+                  onChange={(e) => setEmailMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  rows={6}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none"
+                />
+              </div>
+
+              {sendStatus === "success" && (
+                <div className="text-green-500 text-sm flex items-center gap-2">
+                  <span className="text-xl">✓</span> Email sent successfully!
+                </div>
+              )}
+
+              {sendStatus === "error" && (
+                <div className="text-red-500 text-sm flex items-center gap-2">
+                  <span className="text-xl">✗</span> Failed to send email. Please try again.
+                </div>
+              )}
+
+              <Button
+                onClick={handleSendEmail}
+                disabled={!emailSubject || !emailMessage || isSending}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSending ? (
+                  <>Sending...</>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    Send Email
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
