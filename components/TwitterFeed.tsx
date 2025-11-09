@@ -22,6 +22,10 @@ interface Tweet {
   isLiked?: boolean;
   isRetweeted?: boolean;
   isBookmarked?: boolean;
+  // Repost (retweet) support
+  isRepost?: boolean;
+  repostOfId?: string; // id of the original tweet
+  repostMeta?: { by: string; username: string; avatar: string };
 }
 
 export default function TwitterFeed() {
@@ -273,11 +277,61 @@ export default function TwitterFeed() {
   };
 
   const handleRetweet = (tweetId: string) => {
-    setTweets(tweets.map(tweet => 
-      tweet.id === tweetId 
-        ? { ...tweet, isRetweeted: !tweet.isRetweeted, retweets: tweet.isRetweeted ? tweet.retweets - 1 : tweet.retweets + 1 }
-        : tweet
-    ));
+    setTweets(prev => {
+      const idx = prev.findIndex(t => t.id === tweetId);
+      if (idx === -1) return prev;
+
+      const original = prev[idx];
+
+      // If this tweet is a repost item, do nothing (or we could target original)
+      if (original.isRepost && original.repostOfId) {
+        return prev; // avoid reposting a repost card directly
+      }
+
+      const you = { by: 'You', username: 'you', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=you' };
+
+      // Check if you already reposted this tweet
+      const existingRtIndex = prev.findIndex(
+        (t) => t.isRepost && t.repostOfId === original.id && t.repostMeta?.username === 'you'
+      );
+
+      if (existingRtIndex !== -1) {
+        // Undo repost: remove the repost item and decrement original count/state
+        const updated = [...prev];
+        updated.splice(existingRtIndex, 1);
+        updated[idx] = {
+          ...original,
+          isRetweeted: false,
+          retweets: Math.max(0, (original.retweets || 0) - 1),
+        };
+        return updated;
+      }
+
+      // Create a new repost item and bump original counters
+      const repost: Tweet = {
+        id: `rt-${Date.now()}-${original.id}`,
+        author: original.author, // original author's identity is shown in the inner card; outer card notes who reposted
+        content: '',
+        timestamp: 'Just now',
+        likes: 0,
+        retweets: 0,
+        replies: 0,
+        isRepost: true,
+        repostOfId: original.id,
+        repostMeta: you,
+      };
+
+      const updated = [...prev];
+      // Update original tweet state
+      updated[idx] = {
+        ...original,
+        isRetweeted: true,
+        retweets: (original.retweets || 0) + 1,
+      };
+      // Prepend repost to the feed
+      updated.unshift(repost);
+      return updated;
+    });
   };
 
   const handleBookmark = (tweetId: string) => {
@@ -365,9 +419,10 @@ export default function TwitterFeed() {
           <div key={tweet.id} className="p-4 hover:bg-gray-900/50 transition cursor-pointer">
             <div className="flex gap-3">
               {/* Avatar */}
-              <img 
-                src={tweet.author.avatar} 
-                alt={tweet.author.name}
+              {/* For reposts, show the reposting user's avatar; else author's */}
+              <img
+                src={(tweet.isRepost && tweet.repostMeta?.avatar) ? tweet.repostMeta.avatar : tweet.author.avatar}
+                alt={(tweet.isRepost && tweet.repostMeta?.by) ? tweet.repostMeta.by : tweet.author.name}
                 className="w-12 h-12 rounded-full flex-shrink-0"
               />
 
@@ -375,27 +430,67 @@ export default function TwitterFeed() {
               <div className="flex-1 min-w-0">
                 {/* Header */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold hover:underline">{tweet.author.name}</span>
-                  {tweet.author.verified && (
+                  {/* For reposts, header shows who reposted */}
+                  {tweet.isRepost ? (
+                    <>
+                      <span className="text-gray-400">{tweet.repostMeta?.by} reposted</span>
+                      <span className="text-gray-500">·</span>
+                      <span className="text-gray-500">{isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ''}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-bold hover:underline">{tweet.author.name}</span>
+                      {tweet.author.verified && (
                     <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/>
                     </svg>
+                      )}
+                      <span className="text-gray-500">@{tweet.author.username}</span>
+                      <span className="text-gray-500">·</span>
+                      <span className="text-gray-500">
+                        {isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ''}
+                      </span>
+                    </>
                   )}
-                  <span className="text-gray-500">@{tweet.author.username}</span>
-                  <span className="text-gray-500">·</span>
-                  <span className="text-gray-500">
-                    {isMounted && tweet.timestamp ? formatTimestamp(tweet.timestamp) : ""}
-                  </span>
                 </div>
 
-                {/* Tweet Text */}
-                <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
-
-                {/* Media */}
-                {tweet.mediaUrl && (
-                  <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
-                    <img src={tweet.mediaUrl} alt="Tweet media" className="w-full" />
-                  </div>
+                {/* Content area */}
+                {!tweet.isRepost ? (
+                  <>
+                    <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
+                    {tweet.mediaUrl && (
+                      <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
+                        <img src={tweet.mediaUrl} alt="Tweet media" className="w-full" />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // Repost card: embed original tweet preview
+                  (() => {
+                    const original = tweets.find(t => t.id === tweet.repostOfId);
+                    if (!original) return null;
+                    return (
+                      <div className="mt-2 border border-gray-800 rounded-xl p-3 bg-black/30">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold hover:underline">{original.author.name}</span>
+                          {original.author.verified && (
+                            <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/>
+                            </svg>
+                          )}
+                          <span className="text-gray-500">@{original.author.username}</span>
+                          <span className="text-gray-500">·</span>
+                          <span className="text-gray-500">{isMounted && original.timestamp ? formatTimestamp(original.timestamp) : ''}</span>
+                        </div>
+                        <p className="mt-1 whitespace-pre-wrap break-words">{original.content}</p>
+                        {original.mediaUrl && (
+                          <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800">
+                            <img src={original.mediaUrl} alt="Tweet media" className="w-full" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
                 )}
 
                 {/* Actions */}
@@ -409,7 +504,7 @@ export default function TwitterFeed() {
 
                   <button 
                     aria-label={tweet.isRetweeted ? 'Undo retweet' : 'Retweet'}
-                    onClick={() => handleRetweet(tweet.id)}
+                    onClick={() => !tweet.isRepost && handleRetweet(tweet.id)}
                     className={`flex items-center gap-2 group ${tweet.isRetweeted ? 'text-green-500' : 'text-gray-500 hover:text-green-500'}`}
                   >
                     <div className="p-2 rounded-full group-hover:bg-green-500/10 transition">
