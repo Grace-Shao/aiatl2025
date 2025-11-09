@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { addThread, getThreads } from '@/lib/db';
+import { addThread, getThreads } from '../../_lib/db';
 
 export async function GET() {
   const threads = await getThreads();
