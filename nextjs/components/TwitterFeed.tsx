@@ -265,8 +265,15 @@ export default function TwitterFeed() {
           
           try {
             const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-            aiContent = parsed.text || (typeof parsed === 'string' ? parsed : JSON.stringify(parsed)) || 'Check out this response! 🔥';
             aiMediaUrl = parsed.imageUrl;
+            
+            // Only show text if there's actual text content and no image
+            if (parsed.text && typeof parsed.text === 'string') {
+              aiContent = parsed.text;
+            } else if (!aiMediaUrl) {
+              // Only fall back to other content if there's no image
+              aiContent = (typeof parsed === 'string' ? parsed : 'Check out this response! 🔥');
+            }
           } catch {
             aiContent = typeof raw === 'string' ? raw : JSON.stringify(raw);
           }
