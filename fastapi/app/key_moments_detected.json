@@ -1,0 +1,2477 @@
+[
+  {
+    "timestamp": 365.0,
+    "combined_score": 16.08,
+    "play_score": 0.0,
+    "audio_score": 53.61,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      52,
+      53,
+      54
+    ]
+  },
+  {
+    "timestamp": 452.26,
+    "combined_score": 18.31,
+    "play_score": 0.0,
+    "audio_score": 61.03,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      64,
+      65,
+      66
+    ]
+  },
+  {
+    "timestamp": 492.01,
+    "combined_score": 18.03,
+    "play_score": 0.0,
+    "audio_score": 60.1,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      70,
+      71,
+      72
+    ]
+  },
+  {
+    "timestamp": 548.24,
+    "combined_score": 21.85,
+    "play_score": 0.0,
+    "audio_score": 72.84,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      79,
+      80,
+      81
+    ]
+  },
+  {
+    "timestamp": 589.93,
+    "combined_score": 56.39,
+    "play_score": 47.0,
+    "audio_score": 78.3,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      86,
+      87,
+      88
+    ]
+  },
+  {
+    "timestamp": 628.71,
+    "combined_score": 18.25,
+    "play_score": 0.0,
+    "audio_score": 60.83,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      91,
+      92,
+      93
+    ]
+  },
+  {
+    "timestamp": 669.44,
+    "combined_score": 22.64,
+    "play_score": 0.0,
+    "audio_score": 75.46,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      97,
+      98,
+      99
+    ]
+  },
+  {
+    "timestamp": 816.81,
+    "combined_score": 51.83,
+    "play_score": 47.0,
+    "audio_score": 63.1,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      119,
+      120,
+      121
+    ]
+  },
+  {
+    "timestamp": 856.56,
+    "combined_score": 21.84,
+    "play_score": 0.0,
+    "audio_score": 72.79,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      125,
+      126,
+      127
+    ]
+  },
+  {
+    "timestamp": 895.34,
+    "combined_score": 18.15,
+    "play_score": 0.0,
+    "audio_score": 60.52,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      131,
+      132,
+      133
+    ]
+  },
+  {
+    "timestamp": 936.06,
+    "combined_score": 45.67,
+    "play_score": 36.0,
+    "audio_score": 68.24,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      138,
+      139,
+      140
+    ]
+  },
+  {
+    "timestamp": 984.54,
+    "combined_score": 15.75,
+    "play_score": 0.0,
+    "audio_score": 52.49,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      146,
+      147,
+      148
+    ]
+  },
+  {
+    "timestamp": 1022.35,
+    "combined_score": 18.74,
+    "play_score": 0.0,
+    "audio_score": 62.45,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      151,
+      152,
+      153
+    ]
+  },
+  {
+    "timestamp": 1067.92,
+    "combined_score": 50.54,
+    "play_score": 45.0,
+    "audio_score": 63.47,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      158,
+      159,
+      160
+    ]
+  },
+  {
+    "timestamp": 1067.92,
+    "combined_score": 19.04,
+    "play_score": 0.0,
+    "audio_score": 63.47,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      158,
+      159,
+      160
+    ]
+  },
+  {
+    "timestamp": 1105.73,
+    "combined_score": 26.05,
+    "play_score": 6.0,
+    "audio_score": 72.84,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      164,
+      165,
+      166
+    ]
+  },
+  {
+    "timestamp": 1136.75,
+    "combined_score": 32.4,
+    "play_score": 20.0,
+    "audio_score": 61.32,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      169,
+      170,
+      171
+    ]
+  },
+  {
+    "timestamp": 1174.57,
+    "combined_score": 18.33,
+    "play_score": 0.0,
+    "audio_score": 61.1,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      174,
+      175,
+      176
+    ]
+  },
+  {
+    "timestamp": 1212.38,
+    "combined_score": 54.52,
+    "play_score": 50.0,
+    "audio_score": 65.06,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      180,
+      181,
+      182
+    ]
+  },
+  {
+    "timestamp": 1264.73,
+    "combined_score": 26.83,
+    "play_score": 12.0,
+    "audio_score": 61.42,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      188,
+      189,
+      190
+    ]
+  },
+  {
+    "timestamp": 1313.21,
+    "combined_score": 54.26,
+    "play_score": 45.0,
+    "audio_score": 75.86,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      195,
+      196,
+      197
+    ]
+  },
+  {
+    "timestamp": 1313.21,
+    "combined_score": 22.76,
+    "play_score": 0.0,
+    "audio_score": 75.86,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      195,
+      196,
+      197
+    ]
+  },
+  {
+    "timestamp": 1358.78,
+    "combined_score": 23.54,
+    "play_score": 6.0,
+    "audio_score": 64.45,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      202,
+      203,
+      204
+    ]
+  },
+  {
+    "timestamp": 1402.41,
+    "combined_score": 16.88,
+    "play_score": 0.0,
+    "audio_score": 56.27,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      209,
+      210,
+      211
+    ]
+  },
+  {
+    "timestamp": 1445.07,
+    "combined_score": 19.37,
+    "play_score": 0.0,
+    "audio_score": 64.56,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      215,
+      216,
+      217
+    ]
+  },
+  {
+    "timestamp": 1479.97,
+    "combined_score": 29.91,
+    "play_score": 15.0,
+    "audio_score": 64.71,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      220,
+      221,
+      222
+    ]
+  },
+  {
+    "timestamp": 1524.57,
+    "combined_score": 21.81,
+    "play_score": 0.0,
+    "audio_score": 72.7,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      227,
+      228,
+      229
+    ]
+  },
+  {
+    "timestamp": 1524.57,
+    "combined_score": 30.21,
+    "play_score": 12.0,
+    "audio_score": 72.7,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      227,
+      228,
+      229
+    ]
+  },
+  {
+    "timestamp": 1564.32,
+    "combined_score": 29.21,
+    "play_score": 12.0,
+    "audio_score": 69.37,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      232,
+      233,
+      234
+    ]
+  },
+  {
+    "timestamp": 1603.1,
+    "combined_score": 18.58,
+    "play_score": 0.0,
+    "audio_score": 61.95,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      238,
+      239,
+      240
+    ]
+  },
+  {
+    "timestamp": 1632.19,
+    "combined_score": 13.36,
+    "play_score": 0.0,
+    "audio_score": 44.53,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      242,
+      243,
+      244
+    ]
+  },
+  {
+    "timestamp": 1670.0,
+    "combined_score": 44.13,
+    "play_score": 38.0,
+    "audio_score": 58.44,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      248,
+      249,
+      250
+    ]
+  },
+  {
+    "timestamp": 1670.0,
+    "combined_score": 38.53,
+    "play_score": 30.0,
+    "audio_score": 58.44,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 1,
+    "segments_used": [
+      248,
+      249,
+      250
+    ]
+  },
+  {
+    "timestamp": 1739.0,
+    "combined_score": 17.07,
+    "play_score": 0.0,
+    "audio_score": 56.91,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      259,
+      260,
+      261
+    ]
+  },
+  {
+    "timestamp": 1836.54,
+    "combined_score": 33.72,
+    "play_score": 20.0,
+    "audio_score": 65.75,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      274,
+      275,
+      276
+    ]
+  },
+  {
+    "timestamp": 1911.21,
+    "combined_score": 21.62,
+    "play_score": 0.0,
+    "audio_score": 72.06,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      286,
+      287,
+      288
+    ]
+  },
+  {
+    "timestamp": 1972.62,
+    "combined_score": 27.65,
+    "play_score": 0.0,
+    "audio_score": 92.15,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      296,
+      297,
+      298
+    ]
+  },
+  {
+    "timestamp": 1972.62,
+    "combined_score": 31.85,
+    "play_score": 6.0,
+    "audio_score": 92.15,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      296,
+      297,
+      298
+    ]
+  },
+  {
+    "timestamp": 2023.2,
+    "combined_score": 33.63,
+    "play_score": 20.0,
+    "audio_score": 65.43,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      303,
+      304,
+      305
+    ]
+  },
+  {
+    "timestamp": 2076.19,
+    "combined_score": 40.69,
+    "play_score": 30.0,
+    "audio_score": 65.65,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      312,
+      313,
+      314
+    ]
+  },
+  {
+    "timestamp": 2076.19,
+    "combined_score": 19.69,
+    "play_score": 0.0,
+    "audio_score": 65.65,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      312,
+      313,
+      314
+    ]
+  },
+  {
+    "timestamp": 2135.19,
+    "combined_score": 18.77,
+    "play_score": 0.0,
+    "audio_score": 62.57,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      321,
+      322,
+      323
+    ]
+  },
+  {
+    "timestamp": 2177.34,
+    "combined_score": 23.28,
+    "play_score": 0.0,
+    "audio_score": 77.59,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      328,
+      329,
+      330
+    ]
+  },
+  {
+    "timestamp": 2227.92,
+    "combined_score": 12.83,
+    "play_score": 0.0,
+    "audio_score": 42.77,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      335,
+      336,
+      337
+    ]
+  },
+  {
+    "timestamp": 2277.29,
+    "combined_score": 20.78,
+    "play_score": 0.0,
+    "audio_score": 69.28,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      343,
+      344,
+      345
+    ]
+  },
+  {
+    "timestamp": 2362.8,
+    "combined_score": 23.78,
+    "play_score": 0.0,
+    "audio_score": 79.28,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      355,
+      356,
+      357
+    ]
+  },
+  {
+    "timestamp": 2413.37,
+    "combined_score": 33.92,
+    "play_score": 20.0,
+    "audio_score": 66.42,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      363,
+      364,
+      365
+    ]
+  },
+  {
+    "timestamp": 2466.36,
+    "combined_score": 41.21,
+    "play_score": 30.0,
+    "audio_score": 67.37,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      372,
+      373,
+      374
+    ]
+  },
+  {
+    "timestamp": 2466.36,
+    "combined_score": 20.21,
+    "play_score": 0.0,
+    "audio_score": 67.37,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      372,
+      373,
+      374
+    ]
+  },
+  {
+    "timestamp": 2506.1,
+    "combined_score": 18.76,
+    "play_score": 0.0,
+    "audio_score": 62.53,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      378,
+      379,
+      380
+    ]
+  },
+  {
+    "timestamp": 2568.72,
+    "combined_score": 28.2,
+    "play_score": 15.0,
+    "audio_score": 58.99,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      388,
+      389,
+      390
+    ]
+  },
+  {
+    "timestamp": 2600.03,
+    "combined_score": 47.92,
+    "play_score": 47.0,
+    "audio_score": 50.05,
+    "play_category": "MEDIUM",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      393,
+      394,
+      395
+    ]
+  },
+  {
+    "timestamp": 2661.45,
+    "combined_score": 28.76,
+    "play_score": 6.0,
+    "audio_score": 81.85,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      403,
+      404,
+      405
+    ]
+  },
+  {
+    "timestamp": 2706.0,
+    "combined_score": 15.91,
+    "play_score": 0.0,
+    "audio_score": 53.05,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      409,
+      410,
+      411
+    ]
+  },
+  {
+    "timestamp": 2755.38,
+    "combined_score": 16.61,
+    "play_score": 0.0,
+    "audio_score": 55.38,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      417,
+      418,
+      419
+    ]
+  },
+  {
+    "timestamp": 2795.12,
+    "combined_score": 31.31,
+    "play_score": 15.0,
+    "audio_score": 69.36,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      424,
+      425,
+      426
+    ]
+  },
+  {
+    "timestamp": 2852.92,
+    "combined_score": 39.39,
+    "play_score": 30.0,
+    "audio_score": 61.31,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      433,
+      434,
+      435
+    ]
+  },
+  {
+    "timestamp": 2852.92,
+    "combined_score": 18.39,
+    "play_score": 0.0,
+    "audio_score": 61.31,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      433,
+      434,
+      435
+    ]
+  },
+  {
+    "timestamp": 2967.32,
+    "combined_score": 20.48,
+    "play_score": 0.0,
+    "audio_score": 68.26,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      450,
+      451,
+      452
+    ]
+  },
+  {
+    "timestamp": 3013.08,
+    "combined_score": 22.23,
+    "play_score": 0.0,
+    "audio_score": 74.11,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      457,
+      458,
+      459
+    ]
+  },
+  {
+    "timestamp": 3072.09,
+    "combined_score": 21.34,
+    "play_score": 6.0,
+    "audio_score": 57.12,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      466,
+      467,
+      468
+    ]
+  },
+  {
+    "timestamp": 3135.92,
+    "combined_score": 20.98,
+    "play_score": 0.0,
+    "audio_score": 69.93,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      476,
+      477,
+      478
+    ]
+  },
+  {
+    "timestamp": 3186.49,
+    "combined_score": 21.4,
+    "play_score": 0.0,
+    "audio_score": 71.34,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      484,
+      485,
+      486
+    ]
+  },
+  {
+    "timestamp": 3239.48,
+    "combined_score": 20.33,
+    "play_score": 0.0,
+    "audio_score": 67.78,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      485,
+      486,
+      487
+    ]
+  },
+  {
+    "timestamp": 3305.71,
+    "combined_score": 20.37,
+    "play_score": 0.0,
+    "audio_score": 67.91,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      501,
+      502,
+      503
+    ]
+  },
+  {
+    "timestamp": 3305.71,
+    "combined_score": 34.37,
+    "play_score": 20.0,
+    "audio_score": 67.91,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      501,
+      502,
+      503
+    ]
+  },
+  {
+    "timestamp": 3355.09,
+    "combined_score": 42.17,
+    "play_score": 30.0,
+    "audio_score": 70.55,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      509,
+      510,
+      511
+    ]
+  },
+  {
+    "timestamp": 3355.09,
+    "combined_score": 52.67,
+    "play_score": 45.0,
+    "audio_score": 70.55,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      509,
+      510,
+      511
+    ]
+  },
+  {
+    "timestamp": 3435.77,
+    "combined_score": 18.06,
+    "play_score": 0.0,
+    "audio_score": 60.21,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      521,
+      522,
+      523
+    ]
+  },
+  {
+    "timestamp": 3482.74,
+    "combined_score": 18.34,
+    "play_score": 0.0,
+    "audio_score": 61.15,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      529,
+      530,
+      531
+    ]
+  },
+  {
+    "timestamp": 3521.27,
+    "combined_score": 16.15,
+    "play_score": 0.0,
+    "audio_score": 53.82,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      530,
+      531,
+      532
+    ]
+  },
+  {
+    "timestamp": 3553.79,
+    "combined_score": 19.76,
+    "play_score": 0.0,
+    "audio_score": 65.88,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      540,
+      541,
+      542
+    ]
+  },
+  {
+    "timestamp": 3553.79,
+    "combined_score": 19.76,
+    "play_score": 0.0,
+    "audio_score": 65.88,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      540,
+      541,
+      542
+    ]
+  },
+  {
+    "timestamp": 3553.79,
+    "combined_score": 19.76,
+    "play_score": 0.0,
+    "audio_score": 65.88,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      540,
+      541,
+      542
+    ]
+  },
+  {
+    "timestamp": 3604.36,
+    "combined_score": 38.54,
+    "play_score": 30.0,
+    "audio_score": 58.47,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      548,
+      549,
+      550
+    ]
+  },
+  {
+    "timestamp": 3604.36,
+    "combined_score": 17.54,
+    "play_score": 0.0,
+    "audio_score": 58.47,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      548,
+      549,
+      550
+    ]
+  },
+  {
+    "timestamp": 3604.36,
+    "combined_score": 17.54,
+    "play_score": 0.0,
+    "audio_score": 58.47,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      548,
+      549,
+      550
+    ]
+  },
+  {
+    "timestamp": 3657.35,
+    "combined_score": 30.13,
+    "play_score": 15.0,
+    "audio_score": 65.42,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      554,
+      555,
+      556
+    ]
+  },
+  {
+    "timestamp": 3748.87,
+    "combined_score": 17.63,
+    "play_score": 0.0,
+    "audio_score": 58.78,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      570,
+      571,
+      572
+    ]
+  },
+  {
+    "timestamp": 3785.0,
+    "combined_score": 14.52,
+    "play_score": 0.0,
+    "audio_score": 48.4,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      576,
+      577,
+      578
+    ]
+  },
+  {
+    "timestamp": 3785.0,
+    "combined_score": 14.52,
+    "play_score": 0.0,
+    "audio_score": 48.4,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 2,
+    "segments_used": [
+      576,
+      577,
+      578
+    ]
+  },
+  {
+    "timestamp": 3830.0,
+    "combined_score": 20.1,
+    "play_score": 0.0,
+    "audio_score": 67.0,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      583,
+      584,
+      585
+    ]
+  },
+  {
+    "timestamp": 3924.33,
+    "combined_score": 19.39,
+    "play_score": 0.0,
+    "audio_score": 64.64,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      600,
+      601,
+      602
+    ]
+  },
+  {
+    "timestamp": 3966.05,
+    "combined_score": 29.96,
+    "play_score": 20.0,
+    "audio_score": 53.19,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      607,
+      608,
+      609
+    ]
+  },
+  {
+    "timestamp": 3966.05,
+    "combined_score": 24.36,
+    "play_score": 12.0,
+    "audio_score": 53.19,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      607,
+      608,
+      609
+    ]
+  },
+  {
+    "timestamp": 4005.96,
+    "combined_score": 24.73,
+    "play_score": 0.0,
+    "audio_score": 82.44,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      612,
+      613,
+      614
+    ]
+  },
+  {
+    "timestamp": 4050.41,
+    "combined_score": 17.92,
+    "play_score": 0.0,
+    "audio_score": 59.74,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      620,
+      621,
+      622
+    ]
+  },
+  {
+    "timestamp": 4083.96,
+    "combined_score": 26.86,
+    "play_score": 6.0,
+    "audio_score": 75.55,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      626,
+      627,
+      628
+    ]
+  },
+  {
+    "timestamp": 4083.96,
+    "combined_score": 26.86,
+    "play_score": 6.0,
+    "audio_score": 75.55,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      626,
+      627,
+      628
+    ]
+  },
+  {
+    "timestamp": 4116.62,
+    "combined_score": 21.22,
+    "play_score": 0.0,
+    "audio_score": 70.74,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      631,
+      632,
+      633
+    ]
+  },
+  {
+    "timestamp": 4170.13,
+    "combined_score": 52.16,
+    "play_score": 45.0,
+    "audio_score": 68.88,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      638,
+      639,
+      640
+    ]
+  },
+  {
+    "timestamp": 4170.13,
+    "combined_score": 20.66,
+    "play_score": 0.0,
+    "audio_score": 68.88,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      638,
+      639,
+      640
+    ]
+  },
+  {
+    "timestamp": 4207.32,
+    "combined_score": 20.36,
+    "play_score": 0.0,
+    "audio_score": 67.86,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      639,
+      640,
+      641
+    ]
+  },
+  {
+    "timestamp": 4246.32,
+    "combined_score": 14.86,
+    "play_score": 0.0,
+    "audio_score": 49.54,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      650,
+      651,
+      652
+    ]
+  },
+  {
+    "timestamp": 4246.32,
+    "combined_score": 47.76,
+    "play_score": 47.0,
+    "audio_score": 49.54,
+    "play_category": "MEDIUM",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      650,
+      651,
+      652
+    ]
+  },
+  {
+    "timestamp": 4323.42,
+    "combined_score": 26.76,
+    "play_score": 6.0,
+    "audio_score": 75.21,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      661,
+      662,
+      663
+    ]
+  },
+  {
+    "timestamp": 4355.16,
+    "combined_score": 20.51,
+    "play_score": 0.0,
+    "audio_score": 68.35,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      667,
+      668,
+      669
+    ]
+  },
+  {
+    "timestamp": 4355.16,
+    "combined_score": 20.51,
+    "play_score": 0.0,
+    "audio_score": 68.35,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      667,
+      668,
+      669
+    ]
+  },
+  {
+    "timestamp": 4433.17,
+    "combined_score": 36.67,
+    "play_score": 20.0,
+    "audio_score": 75.58,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      680,
+      681,
+      682
+    ]
+  },
+  {
+    "timestamp": 4466.73,
+    "combined_score": 21.47,
+    "play_score": 0.0,
+    "audio_score": 71.58,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      685,
+      686,
+      687
+    ]
+  },
+  {
+    "timestamp": 4466.73,
+    "combined_score": 21.47,
+    "play_score": 0.0,
+    "audio_score": 71.58,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      685,
+      686,
+      687
+    ]
+  },
+  {
+    "timestamp": 4660.83,
+    "combined_score": 16.18,
+    "play_score": 0.0,
+    "audio_score": 53.93,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      715,
+      716,
+      717
+    ]
+  },
+  {
+    "timestamp": 4702.55,
+    "combined_score": 40.53,
+    "play_score": 30.0,
+    "audio_score": 65.09,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      721,
+      722,
+      723
+    ]
+  },
+  {
+    "timestamp": 4736.11,
+    "combined_score": 26.06,
+    "play_score": 6.0,
+    "audio_score": 72.88,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      727,
+      728,
+      729
+    ]
+  },
+  {
+    "timestamp": 4766.04,
+    "combined_score": 14.42,
+    "play_score": 0.0,
+    "audio_score": 48.07,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      731,
+      732,
+      733
+    ]
+  },
+  {
+    "timestamp": 4766.04,
+    "combined_score": 14.42,
+    "play_score": 0.0,
+    "audio_score": 48.07,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      731,
+      732,
+      733
+    ]
+  },
+  {
+    "timestamp": 4834.98,
+    "combined_score": 17.16,
+    "play_score": 0.0,
+    "audio_score": 57.22,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      742,
+      743,
+      744
+    ]
+  },
+  {
+    "timestamp": 4834.98,
+    "combined_score": 17.16,
+    "play_score": 0.0,
+    "audio_score": 57.22,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      742,
+      743,
+      744
+    ]
+  },
+  {
+    "timestamp": 4915.7,
+    "combined_score": 31.13,
+    "play_score": 15.0,
+    "audio_score": 68.76,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      755,
+      756,
+      757
+    ]
+  },
+  {
+    "timestamp": 4953.79,
+    "combined_score": 18.01,
+    "play_score": 0.0,
+    "audio_score": 60.02,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      756,
+      757,
+      758
+    ]
+  },
+  {
+    "timestamp": 4953.79,
+    "combined_score": 18.01,
+    "play_score": 0.0,
+    "audio_score": 60.02,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      756,
+      757,
+      758
+    ]
+  },
+  {
+    "timestamp": 5169.66,
+    "combined_score": 25.96,
+    "play_score": 6.0,
+    "audio_score": 72.53,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      794,
+      795,
+      796
+    ]
+  },
+  {
+    "timestamp": 5203.22,
+    "combined_score": 19.39,
+    "play_score": 0.0,
+    "audio_score": 64.62,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      799,
+      800,
+      801
+    ]
+  },
+  {
+    "timestamp": 5243.13,
+    "combined_score": 17.19,
+    "play_score": 0.0,
+    "audio_score": 57.31,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      804,
+      805,
+      806
+    ]
+  },
+  {
+    "timestamp": 5281.23,
+    "combined_score": 47.11,
+    "play_score": 42.0,
+    "audio_score": 59.04,
+    "play_category": "MEDIUM",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      811,
+      812,
+      813
+    ]
+  },
+  {
+    "timestamp": 5281.23,
+    "combined_score": 17.71,
+    "play_score": 0.0,
+    "audio_score": 59.04,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      811,
+      812,
+      813
+    ]
+  },
+  {
+    "timestamp": 5381.0,
+    "combined_score": 19.45,
+    "play_score": 0.0,
+    "audio_score": 64.84,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      825,
+      826,
+      827
+    ]
+  },
+  {
+    "timestamp": 5381.0,
+    "combined_score": 19.45,
+    "play_score": 0.0,
+    "audio_score": 64.84,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 3,
+    "segments_used": [
+      825,
+      826,
+      827
+    ]
+  },
+  {
+    "timestamp": 5391.0,
+    "combined_score": 37.7,
+    "play_score": 25.0,
+    "audio_score": 67.34,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      826,
+      827,
+      828
+    ]
+  },
+  {
+    "timestamp": 5591.57,
+    "combined_score": 54.04,
+    "play_score": 53.0,
+    "audio_score": 56.46,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      858,
+      859,
+      860
+    ]
+  },
+  {
+    "timestamp": 5591.57,
+    "combined_score": 16.94,
+    "play_score": 0.0,
+    "audio_score": 56.46,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      858,
+      859,
+      860
+    ]
+  },
+  {
+    "timestamp": 5767.86,
+    "combined_score": 21.53,
+    "play_score": 5.0,
+    "audio_score": 60.08,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      882,
+      883,
+      884
+    ]
+  },
+  {
+    "timestamp": 5767.86,
+    "combined_score": 21.53,
+    "play_score": 5.0,
+    "audio_score": 60.08,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      882,
+      883,
+      884
+    ]
+  },
+  {
+    "timestamp": 5767.86,
+    "combined_score": 25.73,
+    "play_score": 11.0,
+    "audio_score": 60.08,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      882,
+      883,
+      884
+    ]
+  },
+  {
+    "timestamp": 5857.96,
+    "combined_score": 26.08,
+    "play_score": 5.0,
+    "audio_score": 75.25,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      897,
+      898,
+      899
+    ]
+  },
+  {
+    "timestamp": 5886.95,
+    "combined_score": 21.0,
+    "play_score": 5.0,
+    "audio_score": 58.32,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      902,
+      903,
+      904
+    ]
+  },
+  {
+    "timestamp": 5920.64,
+    "combined_score": 42.69,
+    "play_score": 35.0,
+    "audio_score": 60.64,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      907,
+      908,
+      909
+    ]
+  },
+  {
+    "timestamp": 5920.64,
+    "combined_score": 21.69,
+    "play_score": 5.0,
+    "audio_score": 60.64,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      907,
+      908,
+      909
+    ]
+  },
+  {
+    "timestamp": 5989.58,
+    "combined_score": 28.45,
+    "play_score": 25.0,
+    "audio_score": 36.51,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      918,
+      919,
+      920
+    ]
+  },
+  {
+    "timestamp": 6027.19,
+    "combined_score": 54.88,
+    "play_score": 53.0,
+    "audio_score": 59.25,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      924,
+      925,
+      926
+    ]
+  },
+  {
+    "timestamp": 6027.19,
+    "combined_score": 17.78,
+    "play_score": 0.0,
+    "audio_score": 59.25,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      924,
+      925,
+      926
+    ]
+  },
+  {
+    "timestamp": 6027.19,
+    "combined_score": 21.28,
+    "play_score": 5.0,
+    "audio_score": 59.25,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      924,
+      925,
+      926
+    ]
+  },
+  {
+    "timestamp": 6027.19,
+    "combined_score": 21.28,
+    "play_score": 5.0,
+    "audio_score": 59.25,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      924,
+      925,
+      926
+    ]
+  },
+  {
+    "timestamp": 6027.19,
+    "combined_score": 21.28,
+    "play_score": 5.0,
+    "audio_score": 59.25,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      924,
+      925,
+      926
+    ]
+  },
+  {
+    "timestamp": 6027.19,
+    "combined_score": 21.28,
+    "play_score": 5.0,
+    "audio_score": 59.25,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      924,
+      925,
+      926
+    ]
+  },
+  {
+    "timestamp": 6027.19,
+    "combined_score": 25.48,
+    "play_score": 11.0,
+    "audio_score": 59.25,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      924,
+      925,
+      926
+    ]
+  },
+  {
+    "timestamp": 6325.7,
+    "combined_score": 19.74,
+    "play_score": 5.0,
+    "audio_score": 54.14,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      969,
+      970,
+      971
+    ]
+  },
+  {
+    "timestamp": 6361.74,
+    "combined_score": 16.77,
+    "play_score": 5.0,
+    "audio_score": 44.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      975,
+      976,
+      977
+    ]
+  },
+  {
+    "timestamp": 6361.74,
+    "combined_score": 27.27,
+    "play_score": 20.0,
+    "audio_score": 44.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      975,
+      976,
+      977
+    ]
+  },
+  {
+    "timestamp": 6361.74,
+    "combined_score": 51.77,
+    "play_score": 55.0,
+    "audio_score": 44.23,
+    "play_category": "MEDIUM",
+    "is_key_moment": true,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      975,
+      976,
+      977
+    ]
+  },
+  {
+    "timestamp": 6361.74,
+    "combined_score": 16.77,
+    "play_score": 5.0,
+    "audio_score": 44.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      975,
+      976,
+      977
+    ]
+  },
+  {
+    "timestamp": 6361.74,
+    "combined_score": 16.77,
+    "play_score": 5.0,
+    "audio_score": 44.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      975,
+      976,
+      977
+    ]
+  },
+  {
+    "timestamp": 6361.74,
+    "combined_score": 27.27,
+    "play_score": 20.0,
+    "audio_score": 44.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      975,
+      976,
+      977
+    ]
+  },
+  {
+    "timestamp": 6556.05,
+    "combined_score": 46.59,
+    "play_score": 35.0,
+    "audio_score": 73.64,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1003,
+      1004,
+      1005
+    ]
+  },
+  {
+    "timestamp": 6556.05,
+    "combined_score": 22.09,
+    "play_score": 0.0,
+    "audio_score": 73.64,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1003,
+      1004,
+      1005
+    ]
+  },
+  {
+    "timestamp": 6556.05,
+    "combined_score": 25.59,
+    "play_score": 5.0,
+    "audio_score": 73.64,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1003,
+      1004,
+      1005
+    ]
+  },
+  {
+    "timestamp": 6556.05,
+    "combined_score": 25.59,
+    "play_score": 5.0,
+    "audio_score": 73.64,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1003,
+      1004,
+      1005
+    ]
+  },
+  {
+    "timestamp": 6856.12,
+    "combined_score": 23.66,
+    "play_score": 5.0,
+    "audio_score": 67.19,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1048,
+      1049,
+      1050
+    ]
+  },
+  {
+    "timestamp": 6885.11,
+    "combined_score": 25.47,
+    "play_score": 5.0,
+    "audio_score": 73.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1049,
+      1050,
+      1051
+    ]
+  },
+  {
+    "timestamp": 6885.11,
+    "combined_score": 25.47,
+    "play_score": 5.0,
+    "audio_score": 73.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1049,
+      1050,
+      1051
+    ]
+  },
+  {
+    "timestamp": 6885.11,
+    "combined_score": 39.47,
+    "play_score": 25.0,
+    "audio_score": 73.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1049,
+      1050,
+      1051
+    ]
+  },
+  {
+    "timestamp": 6885.11,
+    "combined_score": 21.97,
+    "play_score": 0.0,
+    "audio_score": 73.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1049,
+      1050,
+      1051
+    ]
+  },
+  {
+    "timestamp": 6885.11,
+    "combined_score": 25.47,
+    "play_score": 5.0,
+    "audio_score": 73.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1049,
+      1050,
+      1051
+    ]
+  },
+  {
+    "timestamp": 6885.11,
+    "combined_score": 25.47,
+    "play_score": 5.0,
+    "audio_score": 73.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1049,
+      1050,
+      1051
+    ]
+  },
+  {
+    "timestamp": 6885.11,
+    "combined_score": 25.47,
+    "play_score": 5.0,
+    "audio_score": 73.23,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1049,
+      1050,
+      1051
+    ]
+  },
+  {
+    "timestamp": 7025.36,
+    "combined_score": 24.52,
+    "play_score": 5.0,
+    "audio_score": 70.06,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1075,
+      1076,
+      1077
+    ]
+  },
+  {
+    "timestamp": 7025.36,
+    "combined_score": 45.52,
+    "play_score": 35.0,
+    "audio_score": 70.06,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1075,
+      1076,
+      1077
+    ]
+  },
+  {
+    "timestamp": 7025.36,
+    "combined_score": 24.52,
+    "play_score": 5.0,
+    "audio_score": 70.06,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1075,
+      1076,
+      1077
+    ]
+  },
+  {
+    "timestamp": 7046.51,
+    "combined_score": 24.03,
+    "play_score": 5.0,
+    "audio_score": 68.43,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1078,
+      1079,
+      1080
+    ]
+  },
+  {
+    "timestamp": 7080.98,
+    "combined_score": 38.6,
+    "play_score": 25.0,
+    "audio_score": 70.34,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1079,
+      1080,
+      1081
+    ]
+  },
+  {
+    "timestamp": 7100.57,
+    "combined_score": 24.16,
+    "play_score": 5.0,
+    "audio_score": 68.86,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1085,
+      1086,
+      1087
+    ]
+  },
+  {
+    "timestamp": 7100.57,
+    "combined_score": 24.16,
+    "play_score": 5.0,
+    "audio_score": 68.86,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1085,
+      1086,
+      1087
+    ]
+  },
+  {
+    "timestamp": 7251.0,
+    "combined_score": 37.62,
+    "play_score": 25.0,
+    "audio_score": 67.07,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1107,
+      1108,
+      1109
+    ]
+  },
+  {
+    "timestamp": 7251.0,
+    "combined_score": 44.62,
+    "play_score": 35.0,
+    "audio_score": 67.07,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1107,
+      1108,
+      1109
+    ]
+  },
+  {
+    "timestamp": 7251.0,
+    "combined_score": 44.62,
+    "play_score": 35.0,
+    "audio_score": 67.07,
+    "play_category": "LOW",
+    "is_key_moment": false,
+    "description": "Scrambled",
+    "quarter": 4,
+    "segments_used": [
+      1107,
+      1108,
+      1109
+    ]
+  }
+]
