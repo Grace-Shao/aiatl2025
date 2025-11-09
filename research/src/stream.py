@@ -86,22 +86,76 @@ def process_plays_with_audio_sync(intervals: List[float]):
     return all_processed_plays
 
 
-@app.get("/stream/audio")
-async def stream_audio(speed: float = 1.0):
-    if not AUDIO_FILE.exists():
-        return Response(content="Audio file not found", status_code=404)
+def parse_timestamp_from_filename(filename: str) -> float:
+    """
+    Parse timestamp from filename format: 0001_00-00-05.279_description
+    Returns timestamp in seconds.
+    """
+    parts = filename.split('-')
+    if len(parts) < 3:
+        return 0.0
     
-    def iterfile():
-        with open(AUDIO_FILE, mode="rb") as file_like:
-            chunk_size = 8192
-            while chunk := file_like.read(chunk_size):
-                yield chunk
+    # Get 6 characters after the second "-"
+    time_part = parts[2][:6]  # "05.279"
+    
+    # Parse hours, minutes, seconds from the full timestamp
+    hours = int(parts[0].split('_')[-1])  # Get "00" from "0001_00"
+    minutes = int(parts[1])  # "00"
+    seconds = float(time_part)  # "05.279"
+    
+    # Convert to total seconds
+    total_seconds = hours * 3600 + minutes * 60 + seconds
+    return total_seconds
+
+
+@app.get("/stream/audio")
+async def stream_audio():
+    AUDIO_SEGMENTS_DIR = DATA_DIR / "audio_segments"
+    
+    if not AUDIO_SEGMENTS_DIR.exists():
+        return Response(content="Audio segments directory not found", status_code=404)
+    
+    # Get all audio files and parse their timestamps
+    files_list = []
+    for file_path in AUDIO_SEGMENTS_DIR.iterdir():
+        if file_path.is_file():
+            timestamp = parse_timestamp_from_filename(file_path.name)
+            files_list.append({
+                'path': file_path,
+                'timestamp': timestamp,
+                'name': file_path.name
+            })
+    
+    # Sort by timestamp
+    files_list.sort(key=lambda x: x['timestamp'])
+    
+    if not files_list:
+        return Response(content="No audio files found in segments directory", status_code=404)
+    
+    async def iterfile():
+        start_time = asyncio.get_event_loop().time()
+        
+        for i, file_info in enumerate(files_list):
+            # Wait until it's time to load this file
+            if i > 0:
+                target_time = file_info['timestamp']
+                elapsed = asyncio.get_event_loop().time() - start_time
+                wait_time = target_time - elapsed
+                
+                if wait_time > 0:
+                    await asyncio.sleep(wait_time)
+            
+            # Stream the audio file
+            with open(file_info['path'], mode="rb") as file_like:
+                chunk_size = 8192
+                while chunk := file_like.read(chunk_size):
+                    yield chunk
     
     return StreamingResponse(
         iterfile(),
         media_type="audio/wav",
         headers={
-            "Content-Disposition": f"inline; filename={AUDIO_FILE.name}",
+            "Content-Disposition": "inline; filename=streamed_audio.wav",
             "Accept-Ranges": "bytes"
         }
     )
