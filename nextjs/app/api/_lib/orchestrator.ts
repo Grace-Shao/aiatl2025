@@ -178,38 +178,36 @@ class MemeGeneratorAgent {
       }
 
       for (const part of parts) {
-        if (part.text) {
-          result.text = part.text.trim();
-          console.log('Text part:', result.text);
-        } else if (part.inlineData) {
-          // Save the image
+        if (part.inlineData) {
+          // Save image to public/memes directory (tracked by git)
           const imageData = part.inlineData.data; // base64 encoded image
           const mimeType = part.inlineData.mimeType || 'image/png';
           const extension = mimeType.split('/')[1] || 'png';
           
-          // Create public directory if it doesn't exist
-          const publicDir = path.join(process.cwd(), 'public', 'generated-memes');
-          if (!fs.existsSync(publicDir)) {
-            fs.mkdirSync(publicDir, { recursive: true });
+          // Create public/memes directory if it doesn't exist
+          const memesDir = path.join(process.cwd(), 'public', 'memes');
+          if (!fs.existsSync(memesDir)) {
+            fs.mkdirSync(memesDir, { recursive: true });
           }
 
           // Generate unique filename
           const timestamp = Date.now();
           const filename = `meme_${timestamp}.${extension}`;
-          const filepath = path.join(publicDir, filename);
+          const filepath = path.join(memesDir, filename);
 
           // Decode and save the image
           const buffer = Buffer.from(imageData, 'base64');
           fs.writeFileSync(filepath, buffer);
 
-          result.imageUrl = `/generated-memes/${filename}`;
+          result.imageUrl = `/memes/${filename}`;
           console.log('Image saved to:', filepath);
           console.log('Image URL:', result.imageUrl);
         }
+        // Note: We intentionally skip text parts to avoid showing file paths
       }
 
-      if (!result.text && !result.imageUrl) {
-        throw new Error('Gemini returned neither text nor image');
+      if (!result.imageUrl) {
+        throw new Error('Gemini returned no image');
       }
 
       return result;
